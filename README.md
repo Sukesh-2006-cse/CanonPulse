@@ -36,7 +36,7 @@ uv run uvicorn app.main:app --port 8000
 
 Open [http://127.0.0.1:8000](http://127.0.0.1:8000). No credentials or network access are required for the local demo — the bundled series (`data/series/last_monsoon.json`, 220 episodes) and manifest (`data/manifest/last_monsoon.yaml`) are committed data, and the resolver runs entirely offline. Every LLM- or Databricks-backed feature below is opt-in and degrades to a deterministic path automatically when its credentials are absent — nothing crashes, nothing is faked.
 
-Key endpoints (full list in [`app/main.py`](app/main.py), ~29 routes):
+Key endpoint (full list in [`app/main.py`](app/main.py), ~29 routes):
 
 | Endpoint | What it returns |
 |---|---|
