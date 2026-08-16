@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from app.discovery import DatabricksVectorSearchRepository, EvidenceRepository, discover
+from app.discovery import EvidenceRepository, discover
 from app.narrative_models import Excerpt, LedgerEntry, Series
 
 
@@ -19,15 +19,3 @@ def test_retrieval_is_series_filtered_and_explain_why_has_citations():
     assert result.matches[0].explanation
     assert result.matches[0].citation_ids == ["x"]
 
-
-def test_vector_search_adapter_enforces_series_and_version_filters():
-    class FakeVectorClient:
-        def search(self, **kwargs):
-            return [
-                {"series_id": "one", "source_version": "demo", "excerpt_id": "x", "episode": 1, "score": 0.9, "text": "ok"},
-                {"series_id": "two", "source_version": "demo", "excerpt_id": "private", "episode": 1, "score": 1.0, "text": "no"},
-            ]
-
-    hits = DatabricksVectorSearchRepository(FakeVectorClient(), "idx").search("one", "ok", source_version="demo")
-    assert [hit.excerpt_id for hit in hits] == ["x"]
-    assert hits[0].source_hash

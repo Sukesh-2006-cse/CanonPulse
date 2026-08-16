@@ -9,21 +9,11 @@ it sees a given (model, prompt) pair.
 
 Credentials, never hardcoded, read from the environment:
 
-  Governed, on-platform path (preferred):
-    DATABRICKS_ENDPOINT   Foundation Model API serving-endpoint URL
-    DATABRICKS_TOKEN      workspace personal access token
-    DATABRICKS_MODEL      model name served at that endpoint (optional,
-                           defaults to DATABRICKS_ENDPOINT's own default)
-
-  Off-platform measurement path (only so the number can be checked before a
-  Databricks workspace is authenticated -- never presentable as the governed
-  result):
-    OPENAI_API_KEY        API key
+    OPENAI_API_KEY        API key (or local endpoint token)
     OPENAI_MODEL          defaults to "gpt-4o-mini"
-    OPENAI_BASE_URL       defaults to "https://api.openai.com/v1/chat/completions"
+    OPENAI_BASE_URL       defaults to "https://api.openai.com/v1/chat/completions" (or local e.g. "http://127.0.0.1:11434/v1/chat/completions")
 
-If neither is set, this script exits with a clear, actionable message --
-never a stack trace.
+If not set, this script exits with a clear, actionable message.
 
 Usage:
   uv run --group dev python scripts/measure_llm_extraction.py [--limit N] [--cache-path PATH]
@@ -61,12 +51,6 @@ class CredentialsError(RuntimeError):
 def _resolve_credentials() -> tuple[str, str, str]:
     """Returns (endpoint, token, model). Raises CredentialsError with an
     actionable message rather than letting a KeyError/stack trace surface."""
-    databricks_endpoint = os.environ.get("DATABRICKS_ENDPOINT")
-    databricks_token = os.environ.get("DATABRICKS_TOKEN")
-    if databricks_endpoint and databricks_token:
-        model = os.environ.get("DATABRICKS_MODEL", "")
-        return databricks_endpoint, databricks_token, model
-
     openai_key = os.environ.get("OPENAI_API_KEY")
     if openai_key:
         endpoint = os.environ.get("OPENAI_BASE_URL", "https://api.openai.com/v1/chat/completions")
@@ -74,10 +58,9 @@ def _resolve_credentials() -> tuple[str, str, str]:
         return endpoint, openai_key, model
 
     raise CredentialsError(
-        "No credentials found.\n\n"
-        "Set one of:\n"
-        "  DATABRICKS_ENDPOINT + DATABRICKS_TOKEN  (governed, on-platform path)\n"
-        "  OPENAI_API_KEY                          (off-platform, measurement-only path)\n\n"
+        "No LLM credentials found.\n\n"
+        "Set:\n"
+        "  OPENAI_API_KEY (and optionally OPENAI_BASE_URL / OPENAI_MODEL)\n\n"
         "Then re-run:\n"
         "  uv run --group dev python scripts/measure_llm_extraction.py\n"
     )

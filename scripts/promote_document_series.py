@@ -1,9 +1,4 @@
-"""Promote parsed Databricks documents into CanonPulse and run graph extraction.
-
-The script is intentionally explicit about the boundary:
-``ai_parse_document`` produces document structure; CanonPulse decides episode
-boundaries, writes the episode table, then calls the governed graph extractor.
-"""
+"""Promote parsed documents into CanonPulse and run graph extraction."""
 
 from __future__ import annotations
 

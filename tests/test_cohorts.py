@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from app.cohorts import COHORTS, BlindEvaluator, CohortRunner, blind_variants, databricks_cohort_reaction, divergence_by_episode, structural_reaction
+from app.cohorts import COHORTS, BlindEvaluator, CohortRunner, blind_variants, divergence_by_episode, structural_reaction
 from app.retrieval_models import CohortRequest
 
 
@@ -76,19 +76,6 @@ def test_structural_reactions_change_with_weighted_features_not_prose_profiles()
     assert len({round(reaction.engagement, 6) for reaction in reactions}) >= 3
     assert all(reaction.feature_rationale for reaction in reactions)
     assert all(reaction.backend == "local-structural" for reaction in reactions)
-
-
-def test_databricks_cohort_reaction_labels_its_backend():
-    calls = []
-
-    def fake_query(sql: str, params: dict) -> list[tuple]:
-        calls.append((sql, params))
-        return [(0.71,)]
-
-    reaction = databricks_cohort_reaction(COHORTS[0], episode=12, series_id="s1", query=fake_query)
-    assert reaction.backend == "databricks-ai_query"
-    assert reaction.engagement == 0.71
-    assert len(calls) == 1
 
 
 def test_blind_evaluator_is_reproducible_and_strips_variant_labels():

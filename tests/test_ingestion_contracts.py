@@ -104,8 +104,6 @@ def test_real_extractor_fills_fast_stage_from_synopsis_with_scaled_confidence():
 
 def test_real_extractor_deep_stage_falls_back_to_heuristic_without_openai_key(monkeypatch):
     monkeypatch.delenv("OPENAI_API_KEY", raising=False)
-    monkeypatch.delenv("DATABRICKS_HOST", raising=False)
-    monkeypatch.delenv("SERVING_MODEL_ENDPOINT", raising=False)
     repository = InMemorySubmissionRepository()
     submission = SubmissionInput(
         series_id="s1", title="S", genre="thriller",
@@ -120,31 +118,7 @@ def test_real_extractor_deep_stage_falls_back_to_heuristic_without_openai_key(mo
     assert result.backend is None  # HeuristicExtractor sets no backend label
 
 
-def test_real_extractor_deep_stage_prefers_databricks_over_openai(monkeypatch):
-    monkeypatch.setenv("DATABRICKS_HOST", "https://dbc-example.cloud.databricks.com")
-    monkeypatch.setenv("SERVING_MODEL_ENDPOINT", "databricks-gpt-oss-20b")
-    monkeypatch.setenv("OPENAI_API_KEY", "sk-test")
-
-    def fake_transport(*, endpoint, token, model, prompt):
-        assert "dbc-example.cloud.databricks.com" in endpoint
-        return '{"nodes": [], "entries": [], "payoffs": [], "excerpts": []}'
-
-    repository = InMemorySubmissionRepository()
-    submission = SubmissionInput(
-        series_id="s1", title="S", genre="thriller",
-        episodes=[EpisodeInput(episode_number=1, text="Ana promises to return.")],
-    )
-    job = repository.create_submission(submission, source_hash="abc")
-    extractor = RealIngestionExtractor(repository, transport=fake_transport, databricks_token_provider=lambda: "sk-fake-token")
-
-    extractor.extract_deep(submission.episodes[0], job.job_id)
-
-    result = repository.accumulated_result(job.job_id, "deep")
-    assert result.backend == "databricks"
-
-
 def test_real_extractor_deep_stage_uses_llm_when_openai_key_present(monkeypatch):
-    monkeypatch.delenv("DATABRICKS_HOST", raising=False)
     monkeypatch.setenv("OPENAI_API_KEY", "sk-test")
 
     def fake_transport(*, endpoint, token, model, prompt):

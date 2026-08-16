@@ -4,8 +4,8 @@
 
 - `app/` contains the FastAPI service and domain logic. `ledger.py`, `extraction.py`, and `narrative_models.py` implement the narrative graph; `predictor.py` and `rewrite.py` expose scoring and repair attribution. Browser assets live in `app/static/`.
 - `tests/` contains the pytest suite, with one or more focused `test_*.py` modules per feature.
-- `data/` holds the committed demo series and manifest. `scripts/` contains offline generation and opt-in LLM measurement tools.
-- `sql/`, `databricks.yml`, `resources/`, and `app.yaml` define Databricks deployment assets. Design notes and plans are under `docs/superpowers/`.
+- `data/` holds the committed demo series and manifest. `scripts/` contains offline generation and local MLflow logging tools.
+- Design notes and plans are under `docs/superpowers/`.
 
 ## Build, Test, and Development Commands
 
@@ -17,7 +17,7 @@ uv run --group dev pytest
 uv run uvicorn app.main:app --port 8000
 ```
 
-The first command installs locked dependencies, the second runs all tests, and the third starts the local demo at `http://127.0.0.1:8000`. Run a focused test with `uv run --group dev pytest tests/test_ledger.py`. Regenerate the deterministic demo data only when intentionally changing its fixture: `uv run python scripts/generate_series.py`.
+The first command installs locked dependencies, the second runs all tests, and the third starts the local demo at `http://127.0.0.1:8000`. Run local MLflow logging with `uv run python scripts/log_mlflow_run.py` and inspect with `uv run mlflow ui --backend-store-uri sqlite:///mlflow.db`.
 
 ## Coding Style & Naming
 
@@ -29,8 +29,8 @@ Tests use pytest and FastAPI’s `TestClient`; test files and functions are name
 
 ## Commits & Pull Requests
 
-Recent commits use concise Conventional-Commit-style prefixes such as `feat:`, `fix:`, and `docs:` (for example, `fix: validate payoff citations`). Keep commits focused and describe the user-visible or correctness impact. Pull requests should explain the change, list validation commands, link the relevant issue or design note when applicable, and include screenshots for UI changes. Call out Databricks or schema changes explicitly.
+Recent commits use concise Conventional-Commit-style prefixes such as `feat:`, `fix:`, and `docs:` (for example, `fix: validate payoff citations`). Keep commits focused and describe the user-visible or correctness impact.
 
 ## Security & Configuration
 
-Never commit `.env`, tokens, model keys, workspace URLs containing secrets, or generated `mlruns/` data. Local demo mode is offline and uses committed synthetic data; LLM measurement is opt-in, can incur API cost, and must use environment variables. Preserve the project’s explicit disclosure that predictions and cohort reactions are synthetic, not real reader behavior.
+Never commit `.env`, tokens, model keys, or generated `mlruns/` / `mlflow.db` data. Local demo mode is 100% offline and uses committed synthetic data; LLM measurement is opt-in and can use local OpenAI-compatible endpoints or environment variables. Preserve the project’s explicit disclosure that predictions and cohort reactions are synthetic, not real reader behavior.

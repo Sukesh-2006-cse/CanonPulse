@@ -1,7 +1,6 @@
-"""Normalize Databricks Document Parsing output into CanonPulse episodes.
+"""Normalize parsed document elements into CanonPulse episodes.
 
-Databricks owns binary document parsing. This module owns the product-specific
-step after parsing: identifying episode boundaries and preserving the source
+This module handles identifying episode boundaries and preserving the source
 locations needed for cited findings.
 """
 

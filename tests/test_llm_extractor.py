@@ -169,14 +169,14 @@ def test_no_credentials_are_ever_written_into_the_cache_file(tmp_path):
     assert "sk-super-secret-token" not in raw
 
 
-def test_backend_is_databricks_for_a_databricks_endpoint():
+def test_backend_is_local_for_a_local_endpoint():
     extractor = LLMExtractor(
-        endpoint="https://my-workspace.cloud.databricks.com/serving-endpoints/foo/invocations",
+        endpoint="http://127.0.0.1:11434/v1/chat/completions",
         token="tok",
-        model="dbrx",
+        model="llama3",
         transport=RecordingTransport(),
     )
-    assert extractor.backend == "databricks"
+    assert extractor.backend == "local"
 
 
 def test_backend_is_openai_for_the_openai_endpoint():
@@ -207,7 +207,7 @@ def test_cache_key_changes_when_the_model_changes():
 
 
 def test_backend_for_helper_matches_extractor_behaviour():
-    assert backend_for("https://x.cloud.databricks.com/serving-endpoints/e/invocations") == "databricks"
+    assert backend_for("http://127.0.0.1:11434/v1/chat/completions") == "local"
     assert backend_for("https://api.openai.com/v1/chat/completions") == "openai"
 
 
