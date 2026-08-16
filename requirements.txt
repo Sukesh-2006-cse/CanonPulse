@@ -1,7 +1,11 @@
 fastapi>=0.115,<1
 uvicorn[standard]>=0.30,<1
 pydantic>=2.9,<3
+python-multipart>=0.0.18
+networkx>=3.0
 databricks-sdk>=0.85
+
 databricks-sql-connector>=4.0
 mlflow[databricks]>=3.1
 databricks-openai>=0.7
+

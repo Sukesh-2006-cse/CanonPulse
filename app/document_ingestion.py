@@ -144,3 +144,74 @@ def normalize_parsed_document(
         review_required=bool(warnings),
         warnings=warnings,
     )
+
+
+def parse_and_normalize_document(
+    file_path: str,
+    *,
+    series_id: str,
+    title: str,
+    genre: str,
+    ongoing: bool = True,
+    default_episode: int | None = None,
+    language: str = "en",
+) -> DocumentNormalizationResult:
+    """Parse a local manuscript or screenplay and normalize into a Submission."""
+    from pathlib import Path
+    from app.parsers.docling_parser import DoclingParser
+    from app.parsers.screenplay_parser import ScreenplayParser
+
+    suffix = Path(file_path).suffix.lower()
+    if suffix in {".fountain", ".fdx", ".spmd"}:
+        parser = ScreenplayParser()
+    else:
+        parser = DoclingParser()
+
+    parsed = parser.parse_file(file_path)
+    return normalize_parsed_document(
+        parsed,
+        source_path=file_path,
+        series_id=series_id,
+        title=title,
+        genre=genre,
+        ongoing=ongoing,
+        default_episode=default_episode,
+        language=language,
+    )
+
+
+def parse_and_normalize_bytes(
+    content_bytes: bytes,
+    filename: str,
+    *,
+    series_id: str,
+    title: str,
+    genre: str,
+    ongoing: bool = True,
+    default_episode: int | None = None,
+    language: str = "en",
+) -> DocumentNormalizationResult:
+    """Parse uploaded manuscript or screenplay bytes and normalize into a Submission."""
+    from pathlib import Path
+    from app.parsers.docling_parser import DoclingParser
+    from app.parsers.screenplay_parser import ScreenplayParser
+
+    suffix = Path(filename).suffix.lower()
+    if suffix in {".fountain", ".fdx", ".spmd"} or b"<FinalDraft" in content_bytes[:500]:
+        parser = ScreenplayParser()
+    else:
+        parser = DoclingParser()
+
+    parsed = parser.parse_bytes(content_bytes, filename=filename)
+    return normalize_parsed_document(
+        parsed,
+        source_path=filename,
+        series_id=series_id,
+        title=title,
+        genre=genre,
+        ongoing=ongoing,
+        default_episode=default_episode,
+        language=language,
+    )
+
+

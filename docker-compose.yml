@@ -1,0 +1,85 @@
+version: "3.8"
+
+services:
+  app:
+    build: .
+    container_name: canonpulse-app
+    restart: always
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://canonpulse:canonpulse_secret@postgres:5432/canonpulse
+      - MLFLOW_TRACKING_URI=sqlite:///mlflow.db
+      - LANGFUSE_HOST=http://langfuse-server:3000
+      - OLLAMA_HOST=http://ollama:11434
+    depends_on:
+      - postgres
+      - mlflow
+    volumes:
+      - ./data:/app/data
+      - ./mlflow.db:/app/mlflow.db
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: canonpulse-frontend
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:8000
+    depends_on:
+      - app
+
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: canonpulse-postgres
+    restart: always
+    environment:
+      POSTGRES_USER: canonpulse
+      POSTGRES_PASSWORD: canonpulse_secret
+      POSTGRES_DB: canonpulse
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  mlflow:
+    image: ghcr.io/mlflow/mlflow:latest
+    container_name: canonpulse-mlflow
+    restart: always
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./mlflow.db:/mlflow/mlflow.db
+      - ./mlruns:/mlflow/mlruns
+    command: mlflow ui --host 0.0.0.0 --port 5000 --backend-store-uri sqlite:///mlflow/mlflow.db
+
+  langfuse-server:
+    image: langfuse/langfuse:2
+    container_name: canonpulse-langfuse
+    restart: always
+    ports:
+      - "3001:3000"
+    environment:
+      - DATABASE_URL=postgresql://canonpulse:canonpulse_secret@postgres:5432/canonpulse
+      - NEXTAUTH_SECRET=canonpulse_langfuse_secret_12345
+      - SALT=canonpulse_salt_12345
+      - NEXTAUTH_URL=http://localhost:3001
+      - TELEMETRY_ENABLED=false
+    depends_on:
+      - postgres
+
+  ollama:
+    image: ollama/ollama:latest
+    container_name: canonpulse-ollama
+    restart: always
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_models:/root/.ollama
+
+volumes:
+  postgres_data:
+  ollama_models:
