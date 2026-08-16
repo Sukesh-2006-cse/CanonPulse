@@ -59,9 +59,8 @@ export const ExecutiveSuiteDashboard: React.FC<ExecutiveSuiteDashboardProps> = (
 
       {/* Fixed & Scrollable Left Sidebar Navigation */}
       <aside
-        className={`w-64 shrink-0 bg-[#0d0d08] border-r border-[rgba(212,175,55,0.25)] p-6 flex flex-col justify-between z-40 transition-all duration-300 h-screen sticky top-0 overflow-y-auto overflow-x-hidden [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-[#0d0d08] [&::-webkit-scrollbar-thumb]:bg-[rgba(212,175,55,0.2)] hover:[&::-webkit-scrollbar-thumb]:bg-[rgba(212,175,55,0.4)] [&::-webkit-scrollbar-thumb]:rounded-full ${
-          sidebarOpen ? "fixed inset-y-0 left-0 shadow-2xl z-50" : "hidden md:flex"
-        }`}
+        className={`w-64 shrink-0 bg-[#0d0d08] border-r border-[rgba(212,175,55,0.25)] p-6 flex flex-col justify-between z-40 transition-all duration-300 h-screen sticky top-0 overflow-y-auto overflow-x-hidden [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-[#0d0d08] [&::-webkit-scrollbar-thumb]:bg-[rgba(212,175,55,0.2)] hover:[&::-webkit-scrollbar-thumb]:bg-[rgba(212,175,55,0.4)] [&::-webkit-scrollbar-thumb]:rounded-full ${sidebarOpen ? "fixed inset-y-0 left-0 shadow-2xl z-50" : "hidden md:flex"
+          }`}
       >
         <div className="space-y-8">
           {/* Brand Logo & Suite Tag */}
@@ -112,11 +111,10 @@ export const ExecutiveSuiteDashboard: React.FC<ExecutiveSuiteDashboardProps> = (
                     setSidebarOpen(false);
                   }}
                   style={{ fontFamily: "var(--font-body)" }}
-                  className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-xs font-medium transition-all ${
-                    isActive
-                      ? "border border-[#d4af37] text-[#f5f0e8] bg-[#080800] font-semibold"
-                      : "border border-transparent text-[#9a9280] hover:text-[#f5f0e8] hover:border-[rgba(212,175,55,0.45)] hover:bg-[#080800]/50"
-                  }`}
+                  className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-xs font-medium transition-all ${isActive
+                    ? "border border-[#d4af37] text-[#f5f0e8] bg-[#080800] font-semibold"
+                    : "border border-transparent text-[#9a9280] hover:text-[#f5f0e8] hover:border-[rgba(212,175,55,0.45)] hover:bg-[#080800]/50"
+                    }`}
                 >
                   <Icon className={`h-4 w-4 ${isActive ? "text-[#d4af37]" : "text-[#9a9280]"}`} />
                   <span>{item.label}</span>
@@ -168,16 +166,16 @@ export const ExecutiveSuiteDashboard: React.FC<ExecutiveSuiteDashboardProps> = (
                 {activeTab === "overview"
                   ? "Overview"
                   : activeTab === "graphengine"
-                  ? "Graph Engine"
-                  : activeTab === "ingestion"
-                  ? "Series Ingestion"
-                  : activeTab === "findings"
-                  ? "Findings & Evidence"
-                  : activeTab === "personacollab"
-                  ? "Persona Collaboration"
-                  : activeTab === "surfaces"
-                  ? "Writer Surfaces"
-                  : "Continuity Studio"}
+                    ? "Graph Engine"
+                    : activeTab === "ingestion"
+                      ? "Series Ingestion"
+                      : activeTab === "findings"
+                        ? "Findings & Evidence"
+                        : activeTab === "personacollab"
+                          ? "Persona Collaboration"
+                          : activeTab === "surfaces"
+                            ? "Writer Surfaces"
+                            : "Continuity Studio"}
               </span>
             </div>
           </div>
