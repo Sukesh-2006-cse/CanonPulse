@@ -237,7 +237,54 @@ header h1 {
   max-width: 640px;
 }
 
-/* ---- Rewrite attribution ---- */
+/* ---- Rewrite attribution & Buttons ---- */
+
+button,
+.repair-button,
+#memory-search,
+#approve-issue {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease-in-out;
+  outline: none;
+  cursor: pointer;
+  box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+button::before,
+.repair-button::before,
+#memory-search::before,
+#approve-issue::before {
+  content: "";
+  position: absolute;
+  width: 100px;
+  height: 100%;
+  background-image: linear-gradient(
+    120deg,
+    rgba(255, 255, 255, 0) 30%,
+    rgba(255, 255, 255, 0.8),
+    rgba(255, 255, 255, 0) 70%
+  );
+  top: 0;
+  left: -100px;
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+button:hover::before,
+.repair-button:hover::before,
+#memory-search:hover::before,
+#approve-issue:hover::before {
+  animation: shine 1.5s ease-out infinite;
+}
+
+button:hover,
+.repair-button:hover,
+#memory-search:hover,
+#approve-issue:hover {
+  transform: scale(1.05);
+  filter: brightness(1.1);
+}
 
 .repair-button {
   margin-top: 4px;
@@ -248,14 +295,33 @@ header h1 {
   text-transform: uppercase;
   color: #0f1a10;
   background: var(--green);
-  border: none;
+  border: 2px solid rgba(255, 255, 255, 0.4);
   border-radius: 6px;
   padding: 8px 14px;
-  cursor: pointer;
 }
 
-.repair-button:hover {
-  filter: brightness(1.08);
+#memory-search,
+#approve-issue {
+  font: inherit;
+  font-weight: 700;
+  font-size: 12px;
+  color: var(--paper);
+  background: var(--green);
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-radius: 6px;
+  padding: 8px 16px;
+}
+
+@keyframes shine {
+  0% {
+    left: -100px;
+  }
+  60% {
+    left: 100%;
+  }
+  to {
+    left: 100%;
+  }
 }
 
 .surface-grid {

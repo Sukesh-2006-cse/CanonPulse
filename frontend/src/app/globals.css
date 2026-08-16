@@ -21,13 +21,6 @@
     --glow-gold-soft: rgba(232, 168, 32, 0.35);
   }
 
-  /* Universal cursor hiding so the gold feather quill is the sole active pointer */
-  *,
-  *::before,
-  *::after {
-    cursor: none !important;
-  }
-
   html {
     scroll-behavior: smooth;
   }
@@ -177,24 +170,95 @@
 
 /* ── Buttons ──────────────────────────────────────────────────────────────── */
 
+/* ── Buttons ──────────────────────────────────────────────────────────────── */
+
+/* Base Uiverse shiny button style applied to all button elements, .button, .gold-button, and .ghost-button */
+button,
+.button,
+.gold-button,
+.ghost-button {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease-in-out;
+  outline: none;
+  cursor: pointer;
+}
+
+/* Shine animation pseudo-element for all buttons */
+button::before,
+.button::before,
+.gold-button::before,
+.ghost-button::before {
+  content: "";
+  position: absolute;
+  width: 100px;
+  height: 100%;
+  background-image: linear-gradient(
+    120deg,
+    rgba(255, 255, 255, 0) 30%,
+    rgba(255, 255, 255, 0.8),
+    rgba(255, 255, 255, 0) 70%
+  );
+  top: 0;
+  left: -100px;
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+button:hover::before,
+.button:hover::before,
+.gold-button:hover::before,
+.ghost-button:hover::before {
+  animation: shine 1.5s ease-out infinite;
+}
+
+/* Hover scaling for buttons */
+button:hover,
+.button:hover,
+.gold-button:hover,
+.ghost-button:hover {
+  transform: scale(1.05);
+}
+
+/* Icon sliding on button hover */
+button:hover svg,
+button:hover .icon,
+.button:hover svg,
+.button:hover .icon,
+.gold-button:hover svg,
+.gold-button:hover .icon,
+.ghost-button:hover svg,
+.ghost-button:hover .icon {
+  transform: translateX(4px);
+}
+
+/* Smooth transition for internal SVG icons */
+button svg,
+.button svg,
+.gold-button svg,
+.ghost-button svg,
+.icon {
+  transition: all 0.3s ease-in-out;
+}
+
 .gold-button {
   background: linear-gradient(135deg, #f2ca50 0%, #e8a820 100%);
   color: #080800;
   font-family: 'Lora', serif;
   font-weight: 700;
   letter-spacing: 0.05em;
-  transition: all 0.25s ease;
   box-shadow:
     0 0 20px rgba(242, 202, 80, 0.3),
     0 4px 15px rgba(0, 0, 0, 0.3);
+  border: 2px solid rgba(255, 255, 255, 0.3);
 }
 
 .gold-button:hover {
   background: linear-gradient(135deg, #ffd966 0%, #f2ca50 100%);
+  border-color: rgba(255, 255, 255, 0.9);
   box-shadow:
     0 0 35px rgba(242, 202, 80, 0.5),
     0 6px 20px rgba(0, 0, 0, 0.4);
-  transform: translateY(-2px);
 }
 
 .ghost-button {
@@ -203,15 +267,45 @@
   border: 1px solid rgba(242, 202, 80, 0.25);
   font-family: 'Lora', serif;
   font-weight: 500;
-  transition: all 0.25s ease;
 }
 
 .ghost-button:hover {
   background: rgba(242, 202, 80, 0.08);
-  border-color: rgba(242, 202, 80, 0.5);
+  border-color: rgba(242, 202, 80, 0.6);
   color: #f2ca50;
-  box-shadow: 0 0 20px rgba(242, 202, 80, 0.1);
-  transform: translateY(-1px);
+  box-shadow: 0 0 20px rgba(242, 202, 80, 0.2);
+}
+
+.button {
+  position: relative;
+  transition: all 0.3s ease-in-out;
+  box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.2);
+  padding-block: 0.5rem;
+  padding-inline: 1.25rem;
+  background-color: rgb(0, 107, 179);
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #ffffff;
+  gap: 10px;
+  font-weight: bold;
+  border: 3px solid #ffffff4d;
+  outline: none;
+  overflow: hidden;
+  font-size: 15px;
+}
+
+.button:hover {
+  transform: scale(1.05);
+  border-color: #fff9;
+}
+
+.icon {
+  width: 24px;
+  height: 24px;
+  transition: all 0.3s ease-in-out;
 }
 
 /* ── Gradient Text ────────────────────────────────────────────────────────── */
@@ -290,6 +384,20 @@
 @keyframes gold-shimmer {
   0% { background-position: -200% 0; }
   100% { background-position: 200% 0; }
+}
+
+@keyframes shine {
+  0% {
+    left: -100px;
+  }
+
+  60% {
+    left: 100%;
+  }
+
+  to {
+    left: 100%;
+  }
 }
 
 .animate-pulse-glow { animation: pulse-glow 3s ease-in-out infinite; }

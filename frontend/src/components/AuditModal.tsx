@@ -6,9 +6,10 @@ import { X, RefreshCw, BookOpen } from "lucide-react";
 interface AuditModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onLaunchSuite?: () => void;
 }
 
-export const AuditModal: React.FC<AuditModalProps> = ({ isOpen, onClose }) => {
+export const AuditModal: React.FC<AuditModalProps> = ({ isOpen, onClose, onLaunchSuite }) => {
   const [loading, setLoading] = useState(false);
   const [auditData, setAuditData] = useState<{
     headline: {
@@ -115,7 +116,7 @@ export const AuditModal: React.FC<AuditModalProps> = ({ isOpen, onClose }) => {
             </div>
 
             {/* Actions */}
-            <div className="flex items-center justify-between pt-1">
+            <div className="flex items-center justify-between pt-1 gap-3 flex-wrap">
               <button
                 onClick={runAudit}
                 style={{ fontFamily: "var(--font-body)" }}
@@ -123,12 +124,26 @@ export const AuditModal: React.FC<AuditModalProps> = ({ isOpen, onClose }) => {
               >
                 <RefreshCw className="h-3.5 w-3.5" /> Re-run Audit
               </button>
-              <button
-                onClick={onClose}
-                className="gold-button px-7 py-2.5 rounded text-sm font-semibold"
-              >
-                Done
-              </button>
+
+              <div className="flex items-center gap-2">
+                {onLaunchSuite && (
+                  <button
+                    onClick={() => {
+                      onClose();
+                      onLaunchSuite();
+                    }}
+                    className="ghost-button px-5 py-2.5 rounded text-xs font-semibold"
+                  >
+                    Open Executive Suite
+                  </button>
+                )}
+                <button
+                  onClick={onClose}
+                  className="gold-button px-7 py-2.5 rounded text-sm font-semibold"
+                >
+                  Done
+                </button>
+              </div>
             </div>
           </div>
         )}
