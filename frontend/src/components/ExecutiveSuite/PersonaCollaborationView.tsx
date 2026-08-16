@@ -33,6 +33,9 @@ import {
   PenTool,
   Scale,
   History,
+  User,
+  ChevronDown,
+  Copy,
 } from "lucide-react";
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -56,7 +59,7 @@ interface PersonaExecutionData {
   name: string;
   role: string;
   status: PersonaState;
-  executionTime: number; // in seconds
+  executionTime: number;
   tokens: string;
   currentOperation: string;
   currentActivity: string;
@@ -124,7 +127,26 @@ const INITIAL_PERSONAS: PersonaExecutionData[] = [
       twist: "Reveal timing is structurally valid and aligns with Episode 225 climax setup.",
       plotHole: "Scene preserves tension, but Arjun's denial creates an ungrounded structural cliffhanger.",
     },
-    modelOutput: { finding: "reveal_timing_valid", confidence: 0.93, episode: 218 },
+    modelOutput: {
+      persona: "Director",
+      role: "Narrative Vision",
+      target_episode: 218,
+      scene: 4,
+      analysis: {
+        pacing_score: 0.93,
+        scene_function: "Dramatic Tension Peak",
+        structural_verdict: "VALID_NARRATIVE_CLIMAX_SETUP",
+        dramatic_momentum: "High",
+      },
+      citation: {
+        episode: 178,
+        line: 88,
+        quote: "Arjun saw the photograph in secret cabinet.",
+      },
+      graph_annotations: [
+        { action: "SET_NODE_WEIGHT", node_id: "scene_218_4", weight: 0.93 },
+      ],
+    },
     evidence: [{ episode: 178, event: "Arjun saw the photograph in secret cabinet." }],
   },
   {
@@ -144,7 +166,26 @@ const INITIAL_PERSONAS: PersonaExecutionData[] = [
       twist: "Dialogue rhythm and cadence match tone baseline for mystery setup scenes.",
       plotHole: "Dialogue is consistent with established scene flow and prose rhythm.",
     },
-    modelOutput: { finding: "prose_tightness_confirmed", confidence: 0.87, episode: 218 },
+    modelOutput: {
+      persona: "Editor",
+      role: "Prose & Flow",
+      target_episode: 218,
+      scene: 4,
+      analysis: {
+        prose_rhythm_score: 0.87,
+        dialogue_authenticity: "Consistent",
+        cadence_match: "Episode 200 Baseline",
+        subtext_density: "High",
+      },
+      citation: {
+        episode: 200,
+        line: 42,
+        quote: "Interrogation exchange cadence verified.",
+      },
+      graph_annotations: [
+        { action: "FLAG_SUBTEXT", text: "Guarded hesitation before denial" },
+      ],
+    },
     evidence: [{ episode: 218, event: "Scene 4 dialogue cadence benchmarked against Episode 200." }],
   },
   {
@@ -164,7 +205,27 @@ const INITIAL_PERSONAS: PersonaExecutionData[] = [
       twist: "Contradiction detected with Ep 47, but flagged as potential intentional setup.",
       plotHole: "Potential continuity contradiction detected with Episode 47 (Photograph Identification).",
     },
-    modelOutput: { finding: "potential_continuity_conflict", confidence: 0.94, target_episode: 47 },
+    modelOutput: {
+      persona: "Critic",
+      role: "Logic & Narrative Risk",
+      target_episode: 218,
+      scene: 4,
+      analysis: {
+        risk_score: 0.94,
+        contradiction_detected: true,
+        conflicting_episode: 47,
+        conflict_type: "STATEMENT_DISCREPANCY",
+        severity: "CRITICAL",
+      },
+      citation: {
+        episode: 47,
+        line: 142,
+        quote: "Arjun explicitly identified photograph owner.",
+      },
+      graph_annotations: [
+        { action: "ADD_EDGE_CONFLICT", source: "Ep_218_Scene_4", target: "Ep_47_Line_142" },
+      ],
+    },
     evidence: [{ episode: 47, event: "Arjun explicitly identified photograph owner in line 142." }],
   },
   {
@@ -184,7 +245,26 @@ const INITIAL_PERSONAS: PersonaExecutionData[] = [
       twist: "Arjun's guarded emotional state fits secret double agent protector archetype.",
       plotHole: "Arjun's reaction of total ignorance is emotionally inconsistent with his Episode 178 state.",
     },
-    modelOutput: { finding: "emotional_state_transition", confidence: 0.89, character: "Arjun" },
+    modelOutput: {
+      persona: "Psychologist",
+      role: "Character Motivation",
+      target_episode: 218,
+      scene: 4,
+      analysis: {
+        motivation_alignment: 0.89,
+        character: "Arjun",
+        internal_state: "PROTECTIVE_DECEPTION",
+        behavioral_consistency: "Feigned Ignorance matches Oath",
+      },
+      citation: {
+        episode: 178,
+        line: 104,
+        quote: "Swore secret oath to protect Maya's true lineage.",
+      },
+      graph_annotations: [
+        { action: "UPDATE_STATE", character: "Arjun", state: "FEIGNING_IGNORANCE" },
+      ],
+    },
     evidence: [{ episode: 178, event: "Arjun swore secret oath to protect Maya's identity." }],
   },
   {
@@ -204,7 +284,27 @@ const INITIAL_PERSONAS: PersonaExecutionData[] = [
       twist: "Chronology mismatch matches planned timeline reveal recorded in Series Bible for Ep 225.",
       plotHole: "Claiming zero prior knowledge conflicts with established G_true timeline record from Ep 47.",
     },
-    modelOutput: { finding: "g_true_timeline_validation", confidence: 0.97, downstream_payoff_found: true },
+    modelOutput: {
+      persona: "Historian",
+      role: "Canon & Timeline",
+      target_episode: 218,
+      scene: 4,
+      analysis: {
+        g_true_validation: 0.97,
+        downstream_payoff_found: true,
+        payoff_episode: 225,
+        chronological_reality: "VALIDATED",
+        canon_compliance: 0.97,
+      },
+      citation: {
+        episode: 225,
+        line: 19,
+        quote: "Series Bible entry: Arjun reveals secret cabinet key to Maya.",
+      },
+      graph_annotations: [
+        { action: "VERIFY_PAYOFF_EDGE", source: "Ep_218", target_payoff: "Ep_225" },
+      ],
+    },
     evidence: [{ episode: 47, event: "Photograph backstory established in G_true." }],
   },
 ];
@@ -249,23 +349,28 @@ const MATRIX_ROWS: EvidenceMatrixRow[] = [
 ];
 
 // ─────────────────────────────────────────────────────────────────────────────
-// 5-AXIS PENTAGON RADAR CHART COMPONENT
+// PROPORTIONALLY SPACED & NON-OVERLAPPING 5-AXIS PENTAGON RADAR CHART COMPONENT
 // ─────────────────────────────────────────────────────────────────────────────
 
 interface PentagonRadarProps {
   personas: PersonaExecutionData[];
   scenario: ScenarioType;
+  selectedPersonaId: string;
+  onSelectPersona: (id: string) => void;
 }
 
-const PentagonRadarChart: React.FC<PentagonRadarProps> = ({ personas, scenario }) => {
-  const size = 260;
+const PentagonRadarChart: React.FC<PentagonRadarProps> = ({
+  personas,
+  scenario,
+  selectedPersonaId,
+  onSelectPersona,
+}) => {
+  const size = 360;
   const center = size / 2;
-  const radius = 95;
+  const radius = 100; // Controlled radius to ensure 80px outer padding for label badges!
 
-  // 5 vertices angles (starting top 0° = -90° in SVG)
   const angles = [-90, -18, 54, 126, 198];
 
-  // Helper to compute (x, y) for an angle and radial fraction (0 to 1)
   const getPoint = (angleDeg: number, factor: number) => {
     const rad = (angleDeg * Math.PI) / 180;
     return {
@@ -274,12 +379,10 @@ const PentagonRadarChart: React.FC<PentagonRadarProps> = ({ personas, scenario }
     };
   };
 
-  // Generate pentagon grid polygon points for a ring factor
   const getRingPoints = (factor: number) => {
     return angles.map((a) => getPoint(a, factor)).map((p) => `${p.x},${p.y}`).join(" ");
   };
 
-  // Score factors per persona (confidence / 100)
   const polygonPoints = personas
     .map((p, idx) => {
       const conf = scenario === "plot-hole" && (p.id === "critic" || p.id === "historian") ? p.confidence * 0.45 : p.confidence;
@@ -289,9 +392,9 @@ const PentagonRadarChart: React.FC<PentagonRadarProps> = ({ personas, scenario }
     .join(" ");
 
   return (
-    <div className="relative flex flex-col items-center justify-center p-2">
-      <svg width={size} height={size} className="overflow-visible">
-        {/* Outer and Inner Pentagon Rings */}
+    <div className="relative flex flex-col items-center justify-center my-auto p-4 w-full">
+      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="overflow-visible max-w-full">
+        {/* Background Grid Rings */}
         {[0.2, 0.4, 0.6, 0.8, 1.0].map((ring) => (
           <polygon
             key={ring}
@@ -299,12 +402,14 @@ const PentagonRadarChart: React.FC<PentagonRadarProps> = ({ personas, scenario }
             fill="none"
             stroke="rgba(242,202,80,0.12)"
             strokeWidth="1"
-            strokeDasharray={ring === 1.0 ? "none" : "2,2"}
+            strokeDasharray={ring === 1.0 ? "none" : "3,3"}
           />
         ))}
 
-        {/* Axis Lines from Center to Vertices */}
+        {/* Axis Rays */}
         {angles.map((a, idx) => {
+          const p = personas[idx];
+          const isSelected = p?.id === selectedPersonaId;
           const pt = getPoint(a, 1.0);
           return (
             <line
@@ -313,59 +418,106 @@ const PentagonRadarChart: React.FC<PentagonRadarProps> = ({ personas, scenario }
               y1={center}
               x2={pt.x}
               y2={pt.y}
-              stroke="rgba(242,202,80,0.2)"
-              strokeWidth="1"
+              stroke={isSelected ? "#f2ca50" : "rgba(242,202,80,0.2)"}
+              strokeWidth={isSelected ? "2.2" : "1"}
             />
           );
         })}
 
-        {/* Filled Data Polygon */}
+        {/* Main Pentagon Polygon */}
         <polygon
           points={polygonPoints}
-          fill={scenario === "plot-hole" ? "rgba(255,92,77,0.18)" : "rgba(242,202,80,0.18)"}
+          fill={scenario === "plot-hole" ? "rgba(255,92,77,0.2)" : "rgba(242,202,80,0.2)"}
           stroke={scenario === "plot-hole" ? "#ff5c4d" : "#f2ca50"}
-          strokeWidth="2"
-          className="transition-all duration-700"
+          strokeWidth="2.5"
+          className="transition-all duration-500"
         />
 
-        {/* Vertex Points & Labels */}
+        {/* Vertices & Non-Overlapping Highlight Badges */}
         {personas.map((p, idx) => {
+          const isSelected = p.id === selectedPersonaId;
           const conf = scenario === "plot-hole" && (p.id === "critic" || p.id === "historian") ? p.confidence * 0.45 : p.confidence;
           const dataPt = getPoint(angles[idx], conf / 100);
-          const outerPt = getPoint(angles[idx], 1.22);
+          
+          // Place label badges cleanly OUTSIDE vertex circle (factor 1.40) to prevent any polygon overlap!
+          const outerPt = getPoint(angles[idx], 1.42);
+          const labelText = `${p.name} (${Math.round(conf)}%)`;
+          
+          const badgeWidth = Math.max(140, labelText.length * 7.5 + 24);
 
           return (
-            <g key={p.id}>
-              {/* Vertex Data Marker */}
+            <g
+              key={p.id}
+              onClick={() => onSelectPersona(p.id)}
+              className="cursor-pointer group"
+            >
+              {/* Outer Highlight Ring for Selected Vertex */}
+              {isSelected && (
+                <circle
+                  cx={dataPt.x}
+                  cy={dataPt.y}
+                  r="11"
+                  fill="rgba(242,202,80,0.3)"
+                  stroke="#f2ca50"
+                  strokeWidth="1.5"
+                  className="animate-pulse"
+                />
+              )}
+
+              {/* Vertex Point Circle */}
               <circle
                 cx={dataPt.x}
                 cy={dataPt.y}
-                r="4.5"
-                fill={scenario === "plot-hole" && (p.id === "critic" || p.id === "historian") ? "#ff5c4d" : "#f2ca50"}
+                r={isSelected ? "6.5" : "4.5"}
+                fill={
+                  isSelected
+                    ? "#f2ca50"
+                    : scenario === "plot-hole" && (p.id === "critic" || p.id === "historian")
+                    ? "#ff5c4d"
+                    : "#f2ca50"
+                }
                 stroke="#080800"
-                strokeWidth="1.5"
+                strokeWidth="2"
               />
 
-              {/* Vertex Label */}
+              {/* Highlight Badge Rectangle Positioned Cleanly Outside Pentagon */}
+              {isSelected && (
+                <rect
+                  x={outerPt.x - badgeWidth / 2}
+                  y={outerPt.y - 13}
+                  width={badgeWidth}
+                  height="26"
+                  rx="6"
+                  fill="#141408"
+                  stroke="#f2ca50"
+                  strokeWidth="1.5"
+                  className="shadow-xl"
+                />
+              )}
+
+              {/* Vertex Label Text */}
               <text
                 x={outerPt.x}
                 y={outerPt.y}
                 textAnchor="middle"
                 dominantBaseline="middle"
-                fill="#f5f0e8"
-                fontSize="9.5"
+                fill={isSelected ? "#f2ca50" : "#f5f0e8"}
+                fontSize={isSelected ? "11.5" : "10"}
                 fontFamily="var(--font-mono)"
-                fontWeight="bold"
+                fontWeight={isSelected ? "bold" : "normal"}
               >
-                {p.name} ({Math.round(conf)}%)
+                {labelText}
               </text>
             </g>
           );
         })}
       </svg>
 
-      <div className="mt-2 font-mono text-[10px] text-[#9a9280] text-center">
-        5-Axis Persona Alignment Pentagon Geometry
+      <div className="mt-4 font-mono text-xs text-[#9a9280] text-center flex items-center gap-2">
+        <span className="text-[#f2ca50] font-bold">● Highlighted Vertex:</span>
+        <span className="text-[#f5f0e8] uppercase font-bold">
+          {personas.find((p) => p.id === selectedPersonaId)?.name}
+        </span>
       </div>
     </div>
   );
@@ -379,11 +531,14 @@ export const PersonaCollaborationView: React.FC = () => {
   const [scenario, setScenario] = useState<ScenarioType>("intentional-twist");
   const [analysisStatus, setAnalysisStatus] = useState<AnalysisStatus>("idle");
   const [personas, setPersonas] = useState<PersonaExecutionData[]>(INITIAL_PERSONAS);
+  const [selectedPersonaId, setSelectedPersonaId] = useState<string>("director");
   const [logs, setLogs] = useState<ActivityLog[]>([]);
-  const [selectedPersonaDrawer, setSelectedPersonaDrawer] = useState<PersonaExecutionData | null>(null);
   const [isRepairModalOpen, setIsRepairModalOpen] = useState<boolean>(false);
   const [activeMatrixRow, setActiveMatrixRow] = useState<EvidenceMatrixRow | null>(null);
-  const [showPayoffHighlight, setShowPayoffHighlight] = useState<boolean>(false);
+  const [copied, setCopied] = useState(false);
+
+  // Active selected persona object
+  const activeSelectedPersona = personas.find((p) => p.id === selectedPersonaId) || personas[0];
 
   const completedPersonasCount = personas.filter(
     (p) => p.status === "completed" || p.status === "conflict" || p.status === "agreement"
@@ -398,8 +553,6 @@ export const PersonaCollaborationView: React.FC = () => {
   const handleReset = () => {
     setAnalysisStatus("idle");
     setLogs([]);
-    setSelectedPersonaDrawer(null);
-    setShowPayoffHighlight(false);
     setPersonas(
       INITIAL_PERSONAS.map((p) => ({
         ...p,
@@ -484,9 +637,15 @@ export const PersonaCollaborationView: React.FC = () => {
 
   useEffect(() => {
     if (logs.length === 0) {
-      addLog("Writers' Room ready. Click 'Run Parallel Analysis' to launch.", "SYSTEM", "info");
+      addLog("Writers' Room ready. Select any persona from the dropdown menu.", "SYSTEM", "info");
     }
   }, []);
+
+  const copyJsonToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   return (
     <div className="-m-6 bg-[#080800] text-[#f5f0e8] min-h-screen p-6 md:p-8 space-y-6 font-sans border-t border-[rgba(242,202,80,0.12)]">
@@ -582,83 +741,127 @@ export const PersonaCollaborationView: React.FC = () => {
       </div>
 
       {/* ─────────────────────────────────────────────────────────────────────────
-          ROW 1 DASHBOARD GRID: 5 PERSONA CARDS (7 COLS) + 5-AXIS PENTAGON (5 COLS)
+          ROW 1 DASHBOARD GRID: PERSONA DROPDOWN MENU & INTELLIGENCE PANEL (7 COLS) + PENTAGON RADAR (5 COLS)
       ───────────────────────────────────────────────────────────────────────── */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {/* Left Column (7 Cols): 5 Persona Cards */}
-        <div className="lg:col-span-7 glass-panel p-5 rounded-2xl border border-[rgba(242,202,80,0.25)] space-y-4">
-          <div className="flex justify-between items-center border-b border-[rgba(242,202,80,0.12)] pb-3">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+        {/* Left Column (7 Cols): Persona Selector Dropdown Menu + Detailed Intelligence & JSON Panel */}
+        <div className="lg:col-span-7 glass-panel p-5 rounded-2xl border border-[rgba(242,202,80,0.25)] flex flex-col justify-between space-y-4">
+          
+          {/* PERSONA SELECTOR DROPDOWN MENU */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[rgba(242,202,80,0.12)] pb-3">
             <span style={{ fontFamily: "var(--font-mono)" }} className="text-xs text-[#9a9280] uppercase tracking-widest font-semibold">
-              5 PARALLEL PERSONAS
+              SELECT AI PERSONA PERSPECTIVE
             </span>
-            <span className="text-[10px] font-mono text-[#f2ca50]">Click card for detail drawer</span>
+
+            {/* STYLED DROPDOWN MENU */}
+            <div className="flex items-center gap-2 font-mono text-xs">
+              <span className="text-[#9a9280]">AI Persona:</span>
+              <div className="relative">
+                <select
+                  value={selectedPersonaId}
+                  onChange={(e) => setSelectedPersonaId(e.target.value)}
+                  className="bg-[#080800] border border-[rgba(242,202,80,0.3)] rounded-xl pl-3.5 pr-9 py-2 text-xs font-bold text-[#f2ca50] outline-none cursor-pointer appearance-none focus:border-[#f2ca50] shadow-[0_0_12px_rgba(242,202,80,0.15)] min-w-[200px]"
+                >
+                  {personas.map((p) => (
+                    <option key={p.id} value={p.id} className="bg-[#0d0d08] text-[#f5f0e8] py-1">
+                      {p.name} — {p.role}
+                    </option>
+                  ))}
+                </select>
+                <ChevronDown className="h-4 w-4 absolute right-3 top-2.5 text-[#f2ca50] pointer-events-none" />
+              </div>
+            </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-            {personas.map((p) => {
-              const isDrawerSelected = selectedPersonaDrawer?.id === p.id;
-              return (
-                <div
-                  key={p.id}
-                  onClick={() => setSelectedPersonaDrawer(isDrawerSelected ? null : p)}
-                  className={`glass-panel p-3.5 rounded-xl border text-left cursor-pointer transition-all hover:scale-[1.02] flex flex-col justify-between space-y-2.5 ${
-                    isDrawerSelected
-                      ? "bg-[#141408] border-[#f2ca50] shadow-[0_0_15px_rgba(242,202,80,0.25)]"
-                      : "bg-[#0d0d08] border-[rgba(242,202,80,0.15)] hover:border-[rgba(242,202,80,0.3)]"
-                  }`}
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <div className="w-7 h-7 rounded-lg bg-[rgba(242,202,80,0.1)] border border-[rgba(242,202,80,0.25)] flex items-center justify-center">
-                        {renderPersonaIcon(p.id)}
-                      </div>
-                      <div>
-                        <h3 style={{ fontFamily: "var(--font-display)" }} className="text-sm font-bold text-[#f5f0e8]">
-                          {p.name}
-                        </h3>
-                        <p className="text-[10px] font-mono text-[#9a9280]">{p.role}</p>
-                      </div>
-                    </div>
-
-                    <span
-                      className={`text-[8px] font-mono px-1.5 py-0.5 rounded font-bold uppercase border ${
-                        p.status === "conflict"
-                          ? "bg-[rgba(255,92,77,0.15)] text-[#ff5c4d] border-[rgba(255,92,77,0.3)]"
-                          : p.status === "agreement" || p.status === "completed"
-                          ? "bg-[rgba(126,224,138,0.15)] text-[#7ee08a] border-[rgba(126,224,138,0.3)]"
-                          : "bg-[rgba(242,202,80,0.12)] text-[#f2ca50] border-[rgba(242,202,80,0.25)]"
-                      }`}
-                    >
-                      {p.status}
+          {/* DETAILED SELECTED PERSONA INTELLIGENCE & JSON PANEL */}
+          <div className="bg-[#080800] p-4 rounded-xl border border-[rgba(242,202,80,0.2)] space-y-4 font-mono text-xs flex-1 flex flex-col justify-between">
+            {/* Header info */}
+            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[rgba(242,202,80,0.1)] pb-3">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-xl bg-[rgba(242,202,80,0.1)] border border-[rgba(242,202,80,0.25)] flex items-center justify-center shrink-0">
+                  {renderPersonaIcon(activeSelectedPersona.id, "h-5 w-5 text-[#f2ca50]")}
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h2 style={{ fontFamily: "var(--font-display)" }} className="text-xl font-bold italic text-[#f5f0e8]">
+                      {activeSelectedPersona.name}
+                    </h2>
+                    <span className="text-[10px] text-[#7ee08a] font-bold bg-[rgba(126,224,138,0.15)] px-2 py-0.5 rounded border border-[rgba(126,224,138,0.3)]">
+                      {activeSelectedPersona.confidence}% Confidence
                     </span>
                   </div>
-
-                  <div className="space-y-1 font-mono text-[10px] bg-[#080800] p-2 rounded-lg border border-[rgba(242,202,80,0.1)]">
-                    <div className="flex justify-between text-[#9a9280]">
-                      <span>Execution:</span>
-                      <span className="text-[#f2ca50] font-bold">{p.executionTime}s</span>
-                    </div>
-                    <div className="flex justify-between text-[#9a9280]">
-                      <span>Confidence:</span>
-                      <span className="text-[#7ee08a] font-bold">{p.confidence}%</span>
-                    </div>
-                  </div>
+                  <span className="text-[10px] text-[#9a9280] font-mono">
+                    {activeSelectedPersona.role} • Execution: {activeSelectedPersona.executionTime}s • Tokens: {activeSelectedPersona.tokens}
+                  </span>
                 </div>
-              );
-            })}
+              </div>
+
+              <button
+                onClick={() => copyJsonToClipboard(JSON.stringify(activeSelectedPersona.modelOutput, null, 2))}
+                className="ghost-button px-3 py-1.5 rounded-lg text-xs text-[#f2ca50] flex items-center gap-1.5"
+              >
+                <Copy className="h-3.5 w-3.5" />
+                <span>{copied ? "Copied!" : "Copy JSON"}</span>
+              </button>
+            </div>
+
+            {/* Key Finding Statement */}
+            <div className="space-y-1">
+              <span className="text-[9px] text-[#9a9280] uppercase font-bold block">KEY ANALYSIS FINDING</span>
+              <p style={{ fontFamily: "var(--font-body)" }} className="text-xs text-[#f5f0e8] italic bg-[#141408] p-3 rounded-lg border border-[rgba(242,202,80,0.12)]">
+                &quot;{scenario === "plot-hole" ? activeSelectedPersona.findingText.plotHole : activeSelectedPersona.findingText.twist}&quot;
+              </p>
+            </div>
+
+            {/* Reasoning Lenses & Evidence summary */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-[10px]">
+              <div className="bg-[#141408] p-3 rounded-lg border border-[rgba(242,202,80,0.1)] space-y-1">
+                <span className="text-[#9a9280] block font-bold">SPECIALIZED LENSES EVALUATED:</span>
+                <div className="flex flex-wrap gap-1 pt-0.5">
+                  {activeSelectedPersona.lenses.map((lens) => (
+                    <span key={lens} className="bg-[rgba(242,202,80,0.1)] text-[#f2ca50] px-2 py-0.5 rounded font-bold">
+                      {lens}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              <div className="bg-[#141408] p-3 rounded-lg border border-[rgba(242,202,80,0.1)] space-y-1">
+                <span className="text-[#9a9280] block font-bold">CANON EVIDENCE CITATION:</span>
+                <span className="text-[#f5f0e8] block">
+                  Episode {activeSelectedPersona.evidence[0]?.episode}: {activeSelectedPersona.evidence[0]?.event}
+                </span>
+              </div>
+            </div>
+
+            {/* JSON Model Response Output */}
+            <div className="space-y-1 pt-1">
+              <div className="flex justify-between items-center text-[10px] text-[#9a9280]">
+                <span className="uppercase font-bold">STRUCTURED MODEL RESPONSE (JSON)</span>
+                <span className="text-[#f2ca50]">{activeSelectedPersona.id}_output.json</span>
+              </div>
+              <pre className="bg-[#050500] p-4 rounded-xl border border-[rgba(242,202,80,0.2)] text-[11px] text-[#7ee08a] font-mono overflow-x-auto max-h-48 shadow-inner">
+                {JSON.stringify(activeSelectedPersona.modelOutput, null, 2)}
+              </pre>
+            </div>
           </div>
         </div>
 
-        {/* Right Column (5 Cols): 5-Axis Pentagon Consensus Radar Visualizer */}
-        <div className="lg:col-span-5 glass-panel p-5 rounded-2xl border border-[rgba(242,202,80,0.25)] flex flex-col justify-between">
-          <div className="flex justify-between items-center border-b border-[rgba(242,202,80,0.12)] pb-3">
+        {/* Right Column (5 Cols): Scaled & Proportional 5-Axis Pentagon Consensus Radar Visualizer with Clean Non-Overlapping Badges */}
+        <div className="lg:col-span-5 glass-panel p-5 rounded-2xl border border-[rgba(242,202,80,0.25)] flex flex-col justify-between items-center">
+          <div className="w-full flex justify-between items-center border-b border-[rgba(242,202,80,0.12)] pb-3">
             <span style={{ fontFamily: "var(--font-mono)" }} className="text-xs text-[#9a9280] uppercase tracking-widest font-semibold">
               PENTAGON CONSENSUS RADAR
             </span>
             <span className="text-[10px] font-mono text-[#7ee08a] font-bold">5 Vertices Geometry</span>
           </div>
 
-          <PentagonRadarChart personas={personas} scenario={scenario} />
+          <PentagonRadarChart
+            personas={personas}
+            scenario={scenario}
+            selectedPersonaId={selectedPersonaId}
+            onSelectPersona={(id) => setSelectedPersonaId(id)}
+          />
         </div>
       </div>
 
@@ -902,47 +1105,7 @@ export const PersonaCollaborationView: React.FC = () => {
         </div>
       </div>
 
-      {/* ─────────────────────────────────────────────────────────────────────────
-          DRAWER & MODAL OVERLAYS
-      ───────────────────────────────────────────────────────────────────────── */}
-      {selectedPersonaDrawer && (
-        <div className="fixed inset-0 z-50 bg-[#080800]/80 backdrop-blur-md flex justify-end">
-          <div className="w-full max-w-lg bg-[#0d0d08] border-l border-[rgba(242,202,80,0.25)] p-6 space-y-6 overflow-y-auto shadow-2xl">
-            <div className="flex justify-between items-center border-b border-[rgba(242,202,80,0.15)] pb-3">
-              <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl bg-[rgba(242,202,80,0.1)] border border-[rgba(242,202,80,0.25)] flex items-center justify-center shrink-0">
-                  {renderPersonaIcon(selectedPersonaDrawer.id, "h-5 w-5 text-[#f2ca50]")}
-                </div>
-                <div>
-                  <h3 style={{ fontFamily: "var(--font-display)" }} className="text-lg font-bold text-[#f5f0e8]">
-                    {selectedPersonaDrawer.name}
-                  </h3>
-                  <span className="text-xs font-mono text-[#9a9280]">{selectedPersonaDrawer.role}</span>
-                </div>
-              </div>
-
-              <button onClick={() => setSelectedPersonaDrawer(null)} className="text-[#9a9280] hover:text-[#f5f0e8]">
-                <X className="h-5 w-5" />
-              </button>
-            </div>
-
-            <div className="space-y-4 font-mono text-xs">
-              <div className="bg-[#080800] p-3 rounded-xl border border-[rgba(242,202,80,0.15)] flex justify-between">
-                <span className="text-[#9a9280]">Status:</span>
-                <span className="text-[#7ee08a] font-bold uppercase">{selectedPersonaDrawer.status}</span>
-              </div>
-
-              <div className="space-y-1">
-                <span className="text-[#9a9280] uppercase text-[10px] block font-semibold">MODEL OUTPUT (JSON)</span>
-                <pre className="bg-[#080800] p-3 rounded-xl border border-[rgba(242,202,80,0.15)] text-[10px] text-[#f2ca50] overflow-x-auto">
-                  {JSON.stringify(selectedPersonaDrawer.modelOutput, null, 2)}
-                </pre>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
+      {/* SURGICAL REPAIR PREVIEW MODAL */}
       {isRepairModalOpen && (
         <div className="fixed inset-0 z-50 bg-[#080800]/85 backdrop-blur-md flex items-center justify-center p-4">
           <div className="glass-panel border border-[rgba(242,202,80,0.3)] p-6 rounded-2xl max-w-xl w-full space-y-6 shadow-2xl bg-[#0d0d08]">
