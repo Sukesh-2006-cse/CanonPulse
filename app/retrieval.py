@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Protocol
+from typing import Any, Protocol
 
 from app.retrieval_models import RetrievalHit, RetrievalQuery, terms
 
@@ -30,3 +30,19 @@ class LocalRetriever:
                 continue
             results.append(hit.model_copy(update={"score": max(hit.score, overlap / len(query_terms))}))
         return sorted(results, key=lambda hit: (-hit.score, hit.source_id))[: query.limit]
+
+
+class LanceDBRetriever:
+    """Embedded, serverless vector search retriever using LanceDB or embedded store."""
+
+    def __init__(self, vector_store: Any | None = None) -> None:
+        if vector_store is not None:
+            self._store = vector_store
+        else:
+            from app.vector_store import EmbeddedVectorStore
+
+            self._store = EmbeddedVectorStore()
+
+    def search(self, query: RetrievalQuery) -> list[RetrievalHit]:
+        return self._store.search(query)
+

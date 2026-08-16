@@ -12,7 +12,7 @@ from concurrent.futures import TimeoutError as FutureTimeoutError
 from functools import lru_cache
 from pathlib import Path
 
-from fastapi import FastAPI, HTTPException, Query, Request
+from fastapi import FastAPI, File, Form, HTTPException, Query, Request, UploadFile
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
@@ -27,7 +27,7 @@ from app.features import FeatureExtractor
 from app.foreshadowing import ForeshadowingEngine, ForeshadowingProposal
 from app.health import check_liveness, check_readiness
 from app.heuristic_extractor import HeuristicExtractor
-from app.document_ingestion import normalize_parsed_document
+from app.document_ingestion import normalize_parsed_document, parse_and_normalize_bytes
 from app.ingestion import IngestJob, IngestService, IngestionCoordinator, RealIngestionExtractor, Submission
 from app.ingestion_models import IngestionJob, IngestionStatus, SubmissionInput
 from app.ingestion_repository import InMemorySubmissionRepository
@@ -375,6 +375,40 @@ def create_app() -> FastAPI:
             "review_required": normalized.review_required,
             "warnings": normalized.warnings,
         }
+
+    @app.post("/api/ingest/document-file")
+    async def ingest_document_file(
+        file: UploadFile = File(...),
+        series_id: str = Form(...),
+        title: str = Form(...),
+        genre: str = Form(...),
+        ongoing: bool = Form(True),
+        language: str = Form("en"),
+    ) -> dict:
+        """Upload and parse a manuscript file (PDF, DOCX, TXT) via DoclingParser."""
+        content = await file.read()
+        try:
+            normalized = parse_and_normalize_bytes(
+                content_bytes=content,
+                filename=file.filename or "uploaded_document",
+                series_id=series_id,
+                title=title,
+                genre=genre,
+                ongoing=ongoing,
+                language=language,
+            )
+        except ValueError as exc:
+            raise HTTPException(status_code=422, detail=str(exc)) from exc
+
+        job = ingestion_coordinator.submit(normalized.submission)
+        return {
+            "job": job.model_dump(mode="json"),
+            "series_id": normalized.submission.series_id,
+            "episodes": [ep.model_dump(mode="json") for ep in normalized.submission.episodes],
+            "review_required": normalized.review_required,
+            "warnings": normalized.warnings,
+        }
+
 
     @app.get("/api/v2/series/{series_id}/version/{version_id}")
     def scoped_series(series_id: str, version_id: str, request: Request) -> dict:

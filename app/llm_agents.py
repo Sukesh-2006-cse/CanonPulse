@@ -131,13 +131,19 @@ def propose_repair_text(
         cache = json.loads(cache_file.read_text(encoding="utf-8"))
 
     key = cache_key(model, prompt)
-    if key in cache:
-        raw = cache[key]
-    else:
-        raw = transport_fn(endpoint=endpoint, token=token, model=model, prompt=prompt)
-        cache[key] = raw
-        if cache_file is not None:
-            cache_file.parent.mkdir(parents=True, exist_ok=True)
-            cache_file.write_text(json.dumps(cache, indent=2, sort_keys=True), encoding="utf-8")
+    from app.tracing import trace_span
+
+    with trace_span("repair_candidate_generation", entry_id=target_entry_id, node_id=node_id, model=model) as span:
+        if key in cache:
+            raw = cache[key]
+            span.set_attribute("cached", True)
+        else:
+            raw = transport_fn(endpoint=endpoint, token=token, model=model, prompt=prompt)
+            cache[key] = raw
+            span.set_attribute("cached", False)
+            if cache_file is not None:
+                cache_file.parent.mkdir(parents=True, exist_ok=True)
+                cache_file.write_text(json.dumps(cache, indent=2, sort_keys=True), encoding="utf-8")
 
     return raw.strip(), backend
+
