@@ -43,20 +43,47 @@ uv run python scripts/log_mlflow_run.py
 uv run mlflow ui --backend-store-uri sqlite:///mlflow.db
 ```
 
-Key endpoints (full list in [`app/main.py`](app/main.py), ~29 routes):
+Key endpoints (full list in [`app/main.py`](app/main.py), ~30 routes):
 
 | Endpoint | What it returns |
 |---|---|
-| `GET /api/series` | Loaded series metadata, plus backing store (`file`). |
-| `GET /api/audit` | Headline counts and every non-`paid` finding, with citations. |
+| `GET /api/series` | Loaded series metadata, plus backing store (`file` / `directory`). |
+| `GET /api/audit` | Headline counts and every non-`paid` finding, with verbatim citations. |
 | `GET /api/discrimination` / `/api/diagnostics` | An `EndToEndReport` with **two** separately-labelled numbers, `ledger` and `extracted`. |
 | `GET /api/predict?episode=N` | Feature vector at the boundary, the trained model's prediction (`value`, `lower_ci`, `upper_ci`), and a `disclosure` field. Degrades to `golden_path()` on an inference timeout. |
 | `POST /api/repair` | Surgical repair. Counterfactual graph simulation and predicted retention delta. |
-| `GET /api/writers-room` | Persona annotations (`backend: "deterministic-structured"`). |
+| `GET /api/writers-room` | Persona annotations (`backend: "deterministic-structured"` or LLM). |
 | `GET /api/cohorts` | Five structural listener cohorts' per-episode reactions, explicitly disclosed as a simulation, not observed audience data. |
-| `GET /api/handoff`, `/api/debt-board` | Writer handoff sheet and portfolio-wide Narrative Debt Index. |
-| `POST /api/localization` | Translation continuity check, including a graph-derived entity-parity finding. |
 | `POST /api/rewrite` | `{before_episode, after_episode, edits}` → predicted delta computed server-side from the same trained predictor. |
+
+---
+
+## The 5 Unified Product Surfaces
+
+All five surfaces derive from a single underlying **Dual-Layer Narrative Graph Ledger**:
+
+| Surface | Target Persona | Endpoint | Function & Business Value |
+|:---|:---|:---|:---|
+| **1. Series Memory** | **Writer / Showrunner** | `GET /api/memory` | Searchable persistent narrative index answering *"What did we plant in Ep 47?"* with timeline horizon semantics and verbatim citations. |
+| **2. Pre-Publish Check** | **Writer** | `POST /api/prepublish` | Pre-release sidebar that classifies twists vs. holes on unreleased drafts and calculates live retention impact deltas ($\Delta \text{retention}$). |
+| **3. Writer Handoff Sheet** | **Multi-Writer Team** | `GET /api/handoff` | Automated transition audit detailing open, overdue, and inherited obligations when writer teams rotate mid-series. |
+| **4. Showrunner Debt Board** | **Studio Executive** | `GET /api/debt-board` | Portfolio-level dashboard tracking the **Narrative Debt Index ($\text{NDI}$)** across multiple running series. |
+| **5. Localization Check** | **Localization Team** | `POST /api/localization` | Language-agnostic graph validation ensuring translated scripts (Hindi, Spanish, etc.) maintain 1:1 edge alignment with canonical story logic. |
+
+```
+                     ┌──────────────────────────────────────────────┐
+                     │          DUAL-LAYER GRAPH LEDGER             │
+                     │ (Perceived vs True-Time, Claims, Obligations)│
+                     └──────────────────────┬───────────────────────┘
+                                            │
+        ┌───────────────────┬───────────────┼───────────────┬────────────────────┐
+        ↓                   ↓               ↓               ↓                    ↓
+┌───────────────┐   ┌───────────────┐┌──────────────┐┌───────────────┐   ┌────────────────┐
+│1.Series Memory│   │ 2.Pre-Publish ││ 3.Writer     ││ 4.Showrunner  │   │5. Localization │
+│  (Deep Search)│   │   Check (Diff)││  Handoff     ││   Debt Board  │   │   Check        │
+└───────────────┘   └───────────────┘└──────────────┘└───────────────┘   └────────────────┘
+```
+
 
 ## What's actually real vs. synthetic
 

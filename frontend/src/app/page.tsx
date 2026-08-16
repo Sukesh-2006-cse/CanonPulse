@@ -8,6 +8,8 @@ import { ComparisonSection } from "@/components/ComparisonSection";
 import { ArchitectureDiagram } from "@/components/ArchitectureDiagram";
 import { DashboardShowcase } from "@/components/DashboardShowcase";
 import { FeaturesGrid } from "@/components/FeaturesGrid";
+import { WritersRoomSection } from "@/components/WritersRoomSection";
+import { AudienceSimulatorSection } from "@/components/AudienceSimulatorSection";
 import { ComparisonTableSection } from "@/components/ComparisonTableSection";
 import { InteractivePlayground } from "@/components/InteractivePlayground";
 import { TestimonialsSection } from "@/components/TestimonialsSection";
@@ -118,7 +120,9 @@ export default function Home() {
         </section>
 
         <DashboardShowcase />
-        <FeaturesGrid />
+        <FeaturesGrid onOpenSurfaces={() => handleOpenSuite("surfaces")} />
+        <WritersRoomSection onOpenCollaboration={() => handleOpenSuite("personacollab")} />
+        <AudienceSimulatorSection onOpenCohortView={() => handleOpenSuite("surfaces")} />
         <ComparisonTableSection />
         <InteractivePlayground />
         <TestimonialsSection />
