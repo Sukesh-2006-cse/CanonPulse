@@ -31,12 +31,6 @@
     /* Calligraphic serif as primary for headings */
     font-family: 'Lora', 'Georgia', 'Times New Roman', serif;
     overflow-x: hidden;
-    /* Ambient golden glow coming from multiple corners - matches reference */
-    background-image:
-      radial-gradient(ellipse 80% 60% at 85% 95%, rgba(242, 202, 80, 0.28) 0%, rgba(200, 140, 20, 0.12) 35%, transparent 65%),
-      radial-gradient(ellipse 60% 50% at 15% 90%, rgba(200, 130, 20, 0.16) 0%, transparent 50%),
-      radial-gradient(ellipse 50% 40% at 80% 10%, rgba(180, 120, 10, 0.08) 0%, transparent 45%),
-      radial-gradient(ellipse 100% 80% at 50% 100%, rgba(242, 202, 80, 0.06) 0%, transparent 60%);
     background-attachment: fixed;
   }
 }
@@ -84,196 +78,87 @@
 .text-parchment { color: #f5f0e8; }
 .text-warm { color: #d4c49a; }
 
-/* ── Golden Ambient Glow Panels ───────────────────────────────────────────── */
+/* ── Metallic Gold Bordered Panels (No Glow) ──────────────────────────────── */
 
 /* Standard dark glass panel */
 .glass-panel {
-  background: rgba(20, 20, 8, 0.75);
+  background: rgba(13, 13, 8, 0.95);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
-  border: 1px solid rgba(242, 202, 80, 0.1);
-  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease, box-shadow 0.3s ease;
+  border: 1px solid rgba(212, 175, 55, 0.25);
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease;
 }
 
 .glass-panel:hover {
-  border-color: rgba(242, 202, 80, 0.25);
+  border-color: #d4af37;
 }
 
-/* Gold-bordered glass panel — like Astart's warm glowing cards */
+/* Metallic Gold-bordered panel */
 .glass-panel-gold {
-  background: linear-gradient(145deg, rgba(26, 26, 14, 0.95) 0%, rgba(20, 16, 4, 0.9) 100%);
+  background: #0d0d08;
   backdrop-filter: blur(18px);
   -webkit-backdrop-filter: blur(18px);
-  border: 1px solid rgba(242, 202, 80, 0.3);
-  box-shadow:
-    0 0 40px rgba(242, 202, 80, 0.1),
-    0 0 80px rgba(200, 140, 20, 0.06),
-    inset 0 1px 0 rgba(242, 202, 80, 0.12);
-  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease;
+  border: 1px solid #d4af37;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease;
 }
 
 .glass-panel-gold:hover {
-  box-shadow:
-    0 0 50px rgba(242, 202, 80, 0.18),
-    0 0 100px rgba(200, 140, 20, 0.1),
-    inset 0 1px 0 rgba(242, 202, 80, 0.2);
+  border-color: #ffd966;
 }
 
-/* Glowing hero panel — the warm luminous interior glow from reference */
+/* Hero panel with clean metallic gold border */
 .glass-panel-hero {
-  background: linear-gradient(135deg,
-    rgba(30, 24, 4, 0.9) 0%,
-    rgba(20, 18, 6, 0.95) 40%,
-    rgba(28, 22, 6, 0.85) 70%,
-    rgba(40, 30, 8, 0.9) 100%
-  );
+  background: #0d0d08;
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(242, 202, 80, 0.35);
-  box-shadow:
-    0 0 60px rgba(242, 202, 80, 0.15),
-    0 0 120px rgba(200, 140, 20, 0.08),
-    0 4px 30px rgba(0, 0, 0, 0.6),
-    inset 0 0 80px rgba(242, 202, 80, 0.04),
-    inset 0 1px 0 rgba(242, 202, 80, 0.15);
+  border: 1px solid #d4af37;
 }
 
-/* Section with radial golden glow like the reference image */
+/* Section with clean layout (no glowing wash) */
 .section-glow {
   position: relative;
 }
 
-.section-glow::before {
-  content: '';
-  position: absolute;
-  bottom: -10%;
-  right: -5%;
-  width: 60%;
-  height: 70%;
-  background: radial-gradient(ellipse, rgba(242, 202, 80, 0.22) 0%, rgba(200, 140, 20, 0.1) 40%, transparent 70%);
-  pointer-events: none;
-  z-index: 0;
-  animation: subtle-breath 8s ease-in-out infinite alternate;
-}
-
-.section-glow::after {
-  content: '';
-  position: absolute;
-  bottom: -5%;
-  left: -5%;
-  width: 40%;
-  height: 50%;
-  background: radial-gradient(ellipse, rgba(220, 150, 20, 0.12) 0%, transparent 60%);
-  pointer-events: none;
-  z-index: 0;
-}
-
 /* ── Buttons ──────────────────────────────────────────────────────────────── */
 
-/* ── Buttons ──────────────────────────────────────────────────────────────── */
-
-/* Base Uiverse shiny button style applied to all button elements, .button, .gold-button, and .ghost-button */
+/* Base button styling */
 button,
 .button,
 .gold-button,
 .ghost-button {
   position: relative;
   overflow: hidden;
-  transition: all 0.3s ease-in-out;
+  transition: all 0.25s ease-in-out;
   outline: none;
   cursor: pointer;
 }
 
-/* Shine animation pseudo-element for all buttons */
-button::before,
-.button::before,
-.gold-button::before,
-.ghost-button::before {
-  content: "";
-  position: absolute;
-  width: 100px;
-  height: 100%;
-  background-image: linear-gradient(
-    120deg,
-    rgba(255, 255, 255, 0) 30%,
-    rgba(255, 255, 255, 0.8),
-    rgba(255, 255, 255, 0) 70%
-  );
-  top: 0;
-  left: -100px;
-  opacity: 0.6;
-  pointer-events: none;
-}
-
-button:hover::before,
-.button:hover::before,
-.gold-button:hover::before,
-.ghost-button:hover::before {
-  animation: shine 1.5s ease-out infinite;
-}
-
-/* Hover scaling for buttons */
-button:hover,
-.button:hover,
-.gold-button:hover,
-.ghost-button:hover {
-  transform: scale(1.05);
-}
-
-/* Icon sliding on button hover */
-button:hover svg,
-button:hover .icon,
-.button:hover svg,
-.button:hover .icon,
-.gold-button:hover svg,
-.gold-button:hover .icon,
-.ghost-button:hover svg,
-.ghost-button:hover .icon {
-  transform: translateX(4px);
-}
-
-/* Smooth transition for internal SVG icons */
-button svg,
-.button svg,
-.gold-button svg,
-.ghost-button svg,
-.icon {
-  transition: all 0.3s ease-in-out;
-}
-
 .gold-button {
-  background: linear-gradient(135deg, #f2ca50 0%, #e8a820 100%);
+  background: linear-gradient(135deg, #d4af37 0%, #aa820a 100%);
   color: #080800;
   font-family: 'Lora', serif;
   font-weight: 700;
   letter-spacing: 0.05em;
-  box-shadow:
-    0 0 20px rgba(242, 202, 80, 0.3),
-    0 4px 15px rgba(0, 0, 0, 0.3);
-  border: 2px solid rgba(255, 255, 255, 0.3);
+  border: 1px solid #ffd966;
 }
 
 .gold-button:hover {
-  background: linear-gradient(135deg, #ffd966 0%, #f2ca50 100%);
-  border-color: rgba(255, 255, 255, 0.9);
-  box-shadow:
-    0 0 35px rgba(242, 202, 80, 0.5),
-    0 6px 20px rgba(0, 0, 0, 0.4);
+  background: linear-gradient(135deg, #ffd966 0%, #d4af37 100%);
+  border-color: #ffffff;
 }
 
 .ghost-button {
-  background: rgba(20, 20, 8, 0.6);
+  background: #080800;
   color: #f5f0e8;
-  border: 1px solid rgba(242, 202, 80, 0.25);
+  border: 1px solid rgba(212, 175, 55, 0.35);
   font-family: 'Lora', serif;
   font-weight: 500;
 }
 
 .ghost-button:hover {
-  background: rgba(242, 202, 80, 0.08);
-  border-color: rgba(242, 202, 80, 0.6);
+  background: #141408;
+  border-color: #d4af37;
   color: #f2ca50;
-  box-shadow: 0 0 20px rgba(242, 202, 80, 0.2);
 }
 
 .button {

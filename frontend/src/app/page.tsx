@@ -21,13 +21,17 @@ import { ExecutiveSuiteDashboard } from "@/components/ExecutiveSuite/ExecutiveSu
 export default function Home() {
   const [isAuditModalOpen, setIsAuditModalOpen] = useState(false);
   const [showSuite, setShowSuite] = useState(false);
-  const [suiteTab, setSuiteTab] = useState<"overview" | "graphengine" | "ingestion" | "findings" | "surfaces" | "personacollab">("overview");
+  const [suiteTab, setSuiteTab] = useState<"overview" | "graphengine" | "ingestion" | "findings" | "surfaces" | "personacollab" | "continuitystudio">("overview");
 
   // Sync hash routing on mount and hashchange
   React.useEffect(() => {
     const handleHashChange = () => {
       const hash = window.location.hash;
       if (hash === "#suite" || hash === "#executive-suite" || hash === "#audit") {
+        setShowSuite(true);
+        window.scrollTo({ top: 0, behavior: "instant" });
+      } else if (hash === "#continuity-studio" || hash === "#continuitystudio") {
+        setSuiteTab("continuitystudio");
         setShowSuite(true);
         window.scrollTo({ top: 0, behavior: "instant" });
       }
@@ -37,7 +41,7 @@ export default function Home() {
     return () => window.removeEventListener("hashchange", handleHashChange);
   }, []);
 
-  const handleOpenSuite = (tab: "overview" | "graphengine" | "ingestion" | "findings" | "surfaces" | "personacollab" = "overview") => {
+  const handleOpenSuite = (tab: "overview" | "graphengine" | "ingestion" | "findings" | "surfaces" | "personacollab" | "continuitystudio" = "overview") => {
     setSuiteTab(tab);
     setShowSuite(true);
     if (typeof window !== "undefined") {

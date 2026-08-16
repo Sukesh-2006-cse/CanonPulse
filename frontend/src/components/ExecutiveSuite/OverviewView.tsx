@@ -41,7 +41,7 @@ export const OverviewView: React.FC = () => {
             </h2>
             <span
               style={{ fontFamily: "var(--font-mono)" }}
-              className="text-[10px] tracking-widest text-[#f2ca50] bg-[#141408] border border-[rgba(242,202,80,0.3)] px-3 py-1 rounded-sm uppercase font-semibold flex items-center gap-1.5 shadow-[0_0_12px_rgba(242,202,80,0.15)]"
+              className="text-[10px] tracking-widest text-[#f2ca50] bg-[#141408] border border-[rgba(212,175,55,0.4)] px-3 py-1 rounded-sm uppercase font-semibold flex items-center gap-1.5"
             >
               <Activity className="h-3 w-3 text-[#7ee08a] animate-pulse" />
               LIVE ANALYSIS
@@ -50,7 +50,7 @@ export const OverviewView: React.FC = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Baseline Checker Panel */}
-            <div className="bg-[#080800]/90 border border-[rgba(242,202,80,0.1)] rounded-xl p-5 space-y-4">
+            <div className="bg-[#080800]/90 border border-[rgba(212,175,55,0.2)] rounded-xl p-5 space-y-4">
               <span
                 style={{ fontFamily: "var(--font-mono)" }}
                 className="text-[10px] tracking-widest text-[#9a9280] uppercase font-semibold block"
@@ -76,7 +76,7 @@ export const OverviewView: React.FC = () => {
             </div>
 
             {/* CanonPulse Deep Read Panel */}
-            <div className="bg-[#080800]/90 border border-[rgba(242,202,80,0.2)] rounded-xl p-5 space-y-4 shadow-[0_0_20px_rgba(242,202,80,0.05)]">
+            <div className="bg-[#080800]/90 border border-[rgba(212,175,55,0.3)] rounded-xl p-5 space-y-4">
               <span
                 style={{ fontFamily: "var(--font-mono)" }}
                 className="text-[10px] tracking-widest text-[#f2ca50] uppercase font-semibold block"
@@ -134,7 +134,7 @@ export const OverviewView: React.FC = () => {
         {/* Right Column: Key Analytical Metrics */}
         <div className="lg:col-span-4 space-y-6">
           {/* Card 1: Predicted Continuation */}
-          <div className="glass-panel rounded-2xl p-6 space-y-4 border border-[rgba(242,202,80,0.2)]">
+          <div className="glass-panel rounded-2xl p-6 space-y-4 border border-[rgba(212,175,55,0.3)]">
             <span
               style={{ fontFamily: "var(--font-mono)" }}
               className="text-[10px] tracking-widest text-[#9a9280] uppercase font-semibold block"
@@ -156,8 +156,8 @@ export const OverviewView: React.FC = () => {
               </div>
 
               {/* Progress bar */}
-              <div className="w-full bg-[#141408] h-2 rounded-full mt-3 overflow-hidden border border-[rgba(242,202,80,0.15)]">
-                <div className="bg-gradient-to-r from-[#e8a820] via-[#f2ca50] to-[#7ee08a] h-full w-[84%] rounded-full shadow-[0_0_12px_rgba(242,202,80,0.5)]" />
+              <div className="w-full bg-[#141408] h-2 rounded-full mt-3 overflow-hidden border border-[rgba(212,175,55,0.2)]">
+                <div className="bg-gradient-to-r from-[#e8a820] via-[#f2ca50] to-[#7ee08a] h-full w-[84%] rounded-full" />
               </div>
             </div>
 
