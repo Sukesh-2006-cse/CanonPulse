@@ -102,11 +102,12 @@ export const FindingsEvidenceView: React.FC = () => {
           ].map((item) => (
             <button
               key={item.id}
+              type="button"
               onClick={() => setFilter(item.id as typeof filter)}
               style={{ fontFamily: "var(--font-mono)" }}
               className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
                 filter === item.id
-                  ? "gold-button shadow-[0_0_12px_rgba(242,202,80,0.3)]"
+                  ? "gold-button border border-[#ffd966]"
                   : "ghost-button"
               }`}
             >
@@ -128,7 +129,7 @@ export const FindingsEvidenceView: React.FC = () => {
               }}
               className={`glass-panel p-5 rounded-xl cursor-pointer transition-all border-l-4 ${
                 selectedFinding?.id === finding.id
-                  ? "border-l-[#f2ca50] bg-[rgba(242,202,80,0.06)] shadow-[0_0_20px_rgba(242,202,80,0.15)]"
+                  ? "border-l-[#d4af37] border-t border-r border-b border-[rgba(212,175,55,0.4)] bg-[#141408]/60"
                   : finding.type === "broken"
                   ? "border-l-[#ff5c4d] hover:border-l-[#ff5c4d]"
                   : finding.type === "suspended"

@@ -1,24 +1,25 @@
 "use client";
 
 import React, { useState } from "react";
-import { LayoutGrid, Network, ShieldCheck, FileEdit, Users, Plus, Settings, HelpCircle, Bell, History, Search, BookOpen, ArrowLeft, X, Menu } from "lucide-react";
+import { LayoutGrid, Network, ShieldCheck, FileEdit, Users, Plus, Settings, HelpCircle, Bell, History, Search, BookOpen, ArrowLeft, X, Menu, Layers } from "lucide-react";
 import { OverviewView } from "./OverviewView";
 import { GraphEngineView } from "./GraphEngineView";
 import { SeriesIngestionView } from "./SeriesIngestionView";
 import { FindingsEvidenceView } from "./FindingsEvidenceView";
 import { WriterSurfacesView } from "./WriterSurfacesView";
 import { PersonaCollaborationView } from "./PersonaCollaborationView";
+import { ContinuityStudioView } from "./ContinuityStudioView";
 
 interface ExecutiveSuiteDashboardProps {
   onBackToLanding: () => void;
-  initialTab?: "overview" | "graphengine" | "ingestion" | "findings" | "surfaces" | "personacollab";
+  initialTab?: "overview" | "graphengine" | "ingestion" | "findings" | "surfaces" | "personacollab" | "continuitystudio";
 }
 
 export const ExecutiveSuiteDashboard: React.FC<ExecutiveSuiteDashboardProps> = ({
   onBackToLanding,
   initialTab = "overview",
 }) => {
-  const [activeTab, setActiveTab] = useState<"overview" | "graphengine" | "ingestion" | "findings" | "surfaces" | "personacollab">(initialTab);
+  const [activeTab, setActiveTab] = useState<"overview" | "graphengine" | "ingestion" | "findings" | "surfaces" | "personacollab" | "continuitystudio">(initialTab);
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const navItems = [
@@ -27,12 +28,21 @@ export const ExecutiveSuiteDashboard: React.FC<ExecutiveSuiteDashboardProps> = (
     { id: "findings", label: "Findings & Evidence", icon: ShieldCheck },
     { id: "personacollab", label: "Persona Collaboration", icon: Users },
     { id: "surfaces", label: "Writer Surfaces", icon: FileEdit },
+    { id: "continuitystudio", label: "Continuity Studio", icon: Layers },
   ];
 
   return (
     <div className="min-h-screen bg-[#080800] text-[#f5f0e8] flex flex-col md:flex-row relative">
+      {/* Mobile Backdrop Overlay */}
+      {sidebarOpen && (
+        <div
+          onClick={() => setSidebarOpen(false)}
+          className="fixed inset-0 bg-black/70 backdrop-blur-sm z-40 md:hidden"
+        />
+      )}
+
       {/* Mobile Sidebar Toggle Button */}
-      <div className="md:hidden flex items-center justify-between p-4 border-b border-[rgba(242,202,80,0.15)] bg-[#0d0d08]">
+      <div className="md:hidden flex items-center justify-between p-4 border-b border-[rgba(242,202,80,0.15)] bg-[#0d0d08] sticky top-0 z-30">
         <div className="flex items-center gap-2 text-[#f2ca50]">
           <BookOpen className="h-5 w-5" />
           <span style={{ fontFamily: "var(--font-display)" }} className="font-semibold text-lg italic text-[#f5f0e8]">
@@ -47,17 +57,17 @@ export const ExecutiveSuiteDashboard: React.FC<ExecutiveSuiteDashboardProps> = (
         </button>
       </div>
 
-      {/* Left Sidebar Navigation matching reference designs */}
+      {/* Fixed & Scrollable Left Sidebar Navigation */}
       <aside
-        className={`w-64 bg-[#0d0d08] border-r border-[rgba(242,202,80,0.12)] p-6 flex flex-col justify-between z-40 transition-all duration-300 ${
-          sidebarOpen ? "fixed inset-y-0 left-0 shadow-2xl" : "hidden md:flex"
+        className={`w-64 shrink-0 bg-[#0d0d08] border-r border-[rgba(212,175,55,0.25)] p-6 flex flex-col justify-between z-40 transition-all duration-300 h-screen sticky top-0 overflow-y-auto overflow-x-hidden [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-[#0d0d08] [&::-webkit-scrollbar-thumb]:bg-[rgba(212,175,55,0.2)] hover:[&::-webkit-scrollbar-thumb]:bg-[rgba(212,175,55,0.4)] [&::-webkit-scrollbar-thumb]:rounded-full ${
+          sidebarOpen ? "fixed inset-y-0 left-0 shadow-2xl z-50" : "hidden md:flex"
         }`}
       >
         <div className="space-y-8">
           {/* Brand Logo & Suite Tag */}
           <div className="flex items-center gap-3">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg border border-[rgba(242,202,80,0.4)] bg-[#141408] text-[#f2ca50] shadow-[0_0_18px_rgba(242,202,80,0.25)]">
-              <BookOpen className="h-5 w-5" />
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg border border-[#d4af37] bg-[#080800] text-[#f2ca50]">
+              <BookOpen className="h-5 w-5 text-[#d4af37]" />
             </div>
             <div>
               <span
@@ -75,26 +85,28 @@ export const ExecutiveSuiteDashboard: React.FC<ExecutiveSuiteDashboardProps> = (
             </div>
           </div>
 
-          {/* "+ New Ingestion" CTA Button (Uiverse Shiny Style) */}
+          {/* "+ New Ingestion" CTA Button */}
           <button
+            type="button"
             onClick={() => {
               setActiveTab("ingestion");
               setSidebarOpen(false);
             }}
-            className="gold-button w-full py-2.5 rounded-lg text-xs font-semibold flex items-center justify-center gap-2"
+            className="gold-button w-full py-2.5 rounded-lg text-xs font-semibold flex items-center justify-center gap-2 border border-[#d4af37]"
           >
             <Plus className="h-4 w-4" />
             <span>New Ingestion</span>
           </button>
 
-          {/* Navigation Items */}
-          <nav className="space-y-1">
+          {/* Navigation Items with Metallic Gold Border (No Glowing Box) */}
+          <nav className="space-y-1.5">
             {navItems.map((item) => {
               const Icon = item.icon;
               const isActive = activeTab === item.id;
               return (
                 <button
                   key={item.id}
+                  type="button"
                   onClick={() => {
                     setActiveTab(item.id as typeof activeTab);
                     setSidebarOpen(false);
@@ -102,11 +114,11 @@ export const ExecutiveSuiteDashboard: React.FC<ExecutiveSuiteDashboardProps> = (
                   style={{ fontFamily: "var(--font-body)" }}
                   className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-xs font-medium transition-all ${
                     isActive
-                      ? "bg-[#141408] text-[#f2ca50] border-l-4 border-[#f2ca50] shadow-[0_0_15px_rgba(242,202,80,0.15)] font-semibold"
-                      : "text-[#9a9280] hover:text-[#f5f0e8] hover:bg-[#141408]/60"
+                      ? "border border-[#d4af37] text-[#f5f0e8] bg-[#080800] font-semibold"
+                      : "border border-transparent text-[#9a9280] hover:text-[#f5f0e8] hover:border-[rgba(212,175,55,0.45)] hover:bg-[#080800]/50"
                   }`}
                 >
-                  <Icon className={`h-4 w-4 ${isActive ? "text-[#f2ca50]" : "text-[#9a9280]"}`} />
+                  <Icon className={`h-4 w-4 ${isActive ? "text-[#d4af37]" : "text-[#9a9280]"}`} />
                   <span>{item.label}</span>
                 </button>
               );
@@ -115,17 +127,19 @@ export const ExecutiveSuiteDashboard: React.FC<ExecutiveSuiteDashboardProps> = (
         </div>
 
         {/* Sidebar Footer Links */}
-        <div className="border-t border-[rgba(242,202,80,0.1)] pt-4 space-y-1">
+        <div className="border-t border-[rgba(212,175,55,0.15)] pt-4 space-y-1 mt-6">
           <button
+            type="button"
             style={{ fontFamily: "var(--font-body)" }}
-            className="w-full flex items-center gap-3 px-3.5 py-2 rounded-lg text-xs text-[#9a9280] hover:text-[#f5f0e8] transition-colors"
+            className="w-full flex items-center gap-3 px-3.5 py-2 rounded-lg text-xs text-[#9a9280] hover:text-[#f5f0e8] hover:border hover:border-[rgba(212,175,55,0.3)] transition-colors"
           >
             <Settings className="h-4 w-4" />
             <span>Settings</span>
           </button>
           <button
+            type="button"
             style={{ fontFamily: "var(--font-body)" }}
-            className="w-full flex items-center gap-3 px-3.5 py-2 rounded-lg text-xs text-[#9a9280] hover:text-[#f5f0e8] transition-colors"
+            className="w-full flex items-center gap-3 px-3.5 py-2 rounded-lg text-xs text-[#9a9280] hover:text-[#f5f0e8] hover:border hover:border-[rgba(212,175,55,0.3)] transition-colors"
           >
             <HelpCircle className="h-4 w-4" />
             <span>Support</span>
@@ -161,7 +175,9 @@ export const ExecutiveSuiteDashboard: React.FC<ExecutiveSuiteDashboardProps> = (
                   ? "Findings & Evidence"
                   : activeTab === "personacollab"
                   ? "Persona Collaboration"
-                  : "Writer Surfaces"}
+                  : activeTab === "surfaces"
+                  ? "Writer Surfaces"
+                  : "Continuity Studio"}
               </span>
             </div>
           </div>
@@ -200,6 +216,7 @@ export const ExecutiveSuiteDashboard: React.FC<ExecutiveSuiteDashboardProps> = (
           {activeTab === "findings" && <FindingsEvidenceView />}
           {activeTab === "personacollab" && <PersonaCollaborationView />}
           {activeTab === "surfaces" && <WriterSurfacesView />}
+          {activeTab === "continuitystudio" && <ContinuityStudioView />}
         </main>
       </div>
     </div>
