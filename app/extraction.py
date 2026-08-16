@@ -27,10 +27,8 @@ class ExtractionResult(BaseModel):
     payoffs: list[PayoffLink] = Field(default_factory=list)
     excerpts: list[Excerpt] = Field(default_factory=list)
     rejected: int = 0
-    # None for extractors with no notion of a backend (FakeExtractor,
-    # HeuristicExtractor, DatabricksExtractor's own SQL path). LLMExtractor
-    # sets this to "databricks" or "openai" so a number produced off-platform
-    # can never be silently presented as the governed on-platform result.
+    # None for deterministic extractors (FakeExtractor, HeuristicExtractor).
+    # LLMExtractor sets this to "local" or "openai".
     backend: str | None = None
     citations: list[SourceCitation] = Field(default_factory=list)
     metadata: ExtractionRunMetadata | None = None
@@ -129,69 +127,4 @@ class FakeExtractor:
         return ExtractionResult(nodes=nodes, excerpts=excerpts)
 
 
-class DatabricksExtractor:
-    """Batched ai_query extraction over a Delta episodes table.
 
-    ``connection`` is a caller-supplied DB-API connection already scoped to a
-    warehouse (e.g. a databricks-sql-connector connection built from
-    warehouse/http-path config); this class never constructs one itself, so it
-    never sees or hardcodes warehouse credentials or IDs.
-    """
-
-    def __init__(self, connection, catalog: str, schema: str, model: str) -> None:
-        self._connection = connection
-        self._catalog = catalog
-        self._schema = schema
-        self._model = model
-
-    def extract(self, episodes: list[dict]) -> ExtractionResult:
-        if not episodes:
-            # No episodes means no series to query -- issuing the statement
-            # would either bind an empty/absent series_id or scan unfiltered.
-            # An empty result is the honest answer, not a query.
-            return ExtractionResult()
-
-        series_id = episodes[0]["series_id"]
-
-        sql = (
-            Path(__file__).parent.parent / "sql" / "extract_graph.sql"
-        ).read_text(encoding="utf-8")
-        statement = (
-            sql.replace("${catalog}", self._catalog)
-            .replace("${db}", self._schema)
-            .replace("${model}", self._model)
-        )
-        with self._connection.cursor() as cursor:
-            cursor.execute(statement, {"series_id": series_id})
-            rows = cursor.fetchall()
-
-        result = ExtractionResult()
-        for row in rows:
-            parsed = parse_extraction_row(row[0])
-            if parsed is None:
-                result.rejected += 1
-                continue
-            # A row that is valid JSON but schema-invalid (missing field, wrong
-            # type on urgency/valence, etc.) is rejected wholesale rather than
-            # item-by-item: a single malformed item makes the rest of that row's
-            # bookkeeping suspect too, and the row-level `rejected` counter
-            # already communicates "this row's contribution is missing" to the
-            # ledger. The batch itself still continues.
-            try:
-                nodes = [NarrativeNode.model_validate(item) for item in parsed.get("nodes", [])]
-                entries = [LedgerEntry.model_validate(item) for item in parsed.get("entries", [])]
-                # The model cannot self-authorize a payoff. Verification is a
-                # separate graph step and must remain false at this seam.
-                payoffs = [
-                    PayoffLink.model_validate({**item, "verified": False})
-                    for item in parsed.get("payoffs", [])
-                ]
-                excerpts = [Excerpt.model_validate(item) for item in parsed.get("excerpts", [])]
-            except ValidationError:
-                result.rejected += 1
-                continue
-            result.nodes.extend(nodes)
-            result.entries.extend(entries)
-            result.payoffs.extend(payoffs)
-            result.excerpts.extend(excerpts)
-        return result

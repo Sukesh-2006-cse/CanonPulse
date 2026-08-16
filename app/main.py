@@ -117,11 +117,7 @@ class DocumentIngestRequest(BaseModel):
 def _store() -> SeriesStore:
     """The single place that knows which source the series comes from.
 
-    Selected from environment configuration (see `app.store.store_from_env`):
-    file mode with nothing set, Databricks mode only when host, token, and
-    warehouse id are all present. Logged at first use so which store is
-    active is visible in the startup output, not just inferable from
-    behaviour.
+    Loaded from local storage (see `app.store.store_from_env`).
     """
     store = store_from_env(os.environ, default_series_path=SERIES_PATH)
     print(f"[canonpulse] series store: {store.backend}")
@@ -130,10 +126,6 @@ def _store() -> SeriesStore:
 
 @lru_cache(maxsize=1)
 def _series_cached() -> Series:
-    # Databricks mode fails loudly here: `store.load()` raises
-    # `StatementError` on a failed statement rather than returning a partial
-    # `Series`, and nothing downstream catches it -- a broken configuration
-    # surfaces as a 500, never as a silent fallback to the committed JSON.
     return _store().load()
 
 
@@ -259,10 +251,7 @@ def create_app() -> FastAPI:
             "genre": current.genre,
             "total_episodes": current.total_episodes,
             "source_version": current.source_version,
-            # Which source this response was built from -- "file" (committed
-            # JSON) or "databricks" (Unity Catalog). Never inferred by the
-            # caller; always the store's own label, so a demo cannot claim
-            # to read the lakehouse while quietly serving the file.
+            # Which source this response was built from -- "file" (local committed JSON)
             "source": _store().backend,
         }
 

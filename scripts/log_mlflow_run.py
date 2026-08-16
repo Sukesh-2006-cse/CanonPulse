@@ -1,8 +1,4 @@
-"""Log the training run and the discrimination evaluation to Databricks MLflow.
-
-The spec names MLflow as one of four load-bearing Databricks primitives, and it
-had never executed -- no experiment, no run, no logged metric. A primitive named
-in an architecture but never run is a claim, not a capability.
+"""Log the training run and the discrimination evaluation to local MLflow.
 
 Two runs are logged, deliberately separate because they answer different
 questions and conflating them is how a hollow metric gets read as a real one:
@@ -16,8 +12,8 @@ questions and conflating them is how a hollow metric gets read as a real one:
   prefix so neither can be mistaken for the other in the MLflow UI.
 
 Usage:
-    export DATABRICKS_HOST=... DATABRICKS_TOKEN=...
-    uv run python scripts/log_mlflow_run.py --experiment /Users/<you>/canonpulse
+    uv run python scripts/log_mlflow_run.py
+    uv run mlflow ui --backend-store-uri sqlite:///mlflow.db
 """
 
 from __future__ import annotations
@@ -107,17 +103,26 @@ def log_discrimination(experiment: str) -> tuple[float, float]:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--experiment", required=True)
+    parser.add_argument(
+        "--experiment",
+        default="canonpulse",
+        help="MLflow experiment name (default: canonpulse)",
+    )
+    parser.add_argument(
+        "--tracking-uri",
+        default="sqlite:///mlflow.db",
+        help="MLflow tracking URI (default: sqlite:///mlflow.db)",
+    )
     args = parser.parse_args()
 
-    mlflow.set_tracking_uri("databricks")
+    mlflow.set_tracking_uri(args.tracking_uri)
     mae = log_training(args.experiment)
     ledger_recall, extracted_recall = log_discrimination(args.experiment)
 
     print(f"  held_out_mae      {mae:.4f}")
     print(f"  ledger_recall     {ledger_recall}")
     print(f"  extracted_recall  {extracted_recall}")
-    print(f"\nLogged to {args.experiment}")
+    print(f"\nLogged to '{args.experiment}' at {args.tracking_uri}")
     return 0
 
 

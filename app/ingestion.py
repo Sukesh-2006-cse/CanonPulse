@@ -14,7 +14,6 @@ from typing import Literal
 
 from pydantic import BaseModel, Field, model_validator
 
-from app.databricks_config import databricks_model_config
 from app.extraction import ExtractionResult
 from app.heuristic_extractor import HeuristicExtractor
 from app.ingestion_models import (
@@ -194,24 +193,17 @@ class RealIngestionExtractor:
     """Fast/deep extractor wired into IngestionCoordinator's real lifecycle.
 
     Fast stays HeuristicExtractor-over-synopsis-only (confidence-scaled), same
-    as SynopsisExtractor. Deep prefers the governed Databricks Foundation
-    Model API path when DATABRICKS_HOST/SERVING_MODEL_ENDPOINT are configured
-    and auth succeeds, falls back to OpenAI when only OPENAI_API_KEY is set,
-    and falls back to HeuristicExtractor over the full body when neither is
-    available -- degraded, never faked, and ExtractionResult.backend (None
-    for Heuristic, "databricks" or "openai" for LLMExtractor) tells a caller
-    which one ran.
+    as SynopsisExtractor. Deep uses OpenAI/local LLM when configured, and
+    falls back to HeuristicExtractor over the full body when not configured.
     """
 
     def __init__(
         self,
         repository: SubmissionRepository,
         transport: Transport | None = None,
-        databricks_token_provider=None,
     ) -> None:
         self._repository = repository
         self._transport = transport
-        self._databricks_token_provider = databricks_token_provider
 
     def extract_fast(self, episode: EpisodeInput, job_id: str) -> None:
         result = HeuristicExtractor().extract(
@@ -223,18 +215,8 @@ class RealIngestionExtractor:
 
     def extract_deep(self, episode: EpisodeInput, job_id: str) -> None:
         rows = [{"episode": episode.episode_number, "body": episode.text}]
-        kwargs = {"token_provider": self._databricks_token_provider} if self._databricks_token_provider else {}
-        db_config = databricks_model_config(**kwargs)
         openai_cfg = openai_config()
-        if db_config is not None:
-            result = LLMExtractor(
-                endpoint=db_config.endpoint,
-                token=db_config.token,
-                model=db_config.model,
-                cache_path="data/extraction_cache/deep_ingest_databricks.json",
-                transport=self._transport,
-            ).extract(rows)
-        elif openai_cfg is not None:
+        if openai_cfg is not None:
             result = LLMExtractor(
                 endpoint=openai_cfg.endpoint,
                 token=openai_cfg.token,

@@ -65,35 +65,7 @@ class EvidenceRepository:
         return sorted(hits, key=lambda hit: (-hit.score, hit.episode, hit.excerpt_id))
 
 
-class VectorSearchClient(Protocol):
-    def search(self, *, index_name: str, query: str, series_id: str, source_version: str) -> list[dict]: ...
 
-
-class DatabricksVectorSearchRepository:
-    """Production adapter around a Databricks Vector Search client.
-
-    The client is injected so local tests never require credentials. The
-    adapter enforces the privacy filters at the seam and normalizes results to
-    the same citation model as the deterministic repository.
-    """
-
-    def __init__(self, client: VectorSearchClient, index_name: str) -> None:
-        self._client = client
-        self._index_name = index_name
-
-    def search(self, series_id: str, query: str, *, source_version: str, min_episode: int | None = None, max_episode: int | None = None) -> list[EvidenceHit]:
-        rows = self._client.search(index_name=self._index_name, query=query, series_id=series_id, source_version=source_version)
-        hits = []
-        for row in rows:
-            if row.get("series_id") != series_id or row.get("source_version") != source_version:
-                continue
-            if min_episode is not None and int(row["episode"]) < min_episode:
-                continue
-            if max_episode is not None and int(row["episode"]) > max_episode:
-                continue
-            text = str(row.get("text", ""))
-            hits.append(EvidenceHit(series_id=series_id, excerpt_id=str(row["excerpt_id"]), episode=int(row["episode"]), score=float(row.get("score", 0.0)), text=text, source_version=source_version, source_hash=str(row.get("source_hash") or hashlib.sha256(text.encode()).hexdigest()), matched_dimensions=list(row.get("matched_dimensions", []))))
-        return sorted(hits, key=lambda hit: (-hit.score, hit.episode, hit.excerpt_id))
 
 
 def discover(series: Series, query: str) -> DiscoveryResult:

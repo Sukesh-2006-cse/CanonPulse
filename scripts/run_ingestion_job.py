@@ -1,4 +1,4 @@
-"""Databricks job entry point for the durable two-speed ingest lifecycle."""
+"""Job entry point for the durable two-speed ingest lifecycle."""
 
 from __future__ import annotations
 

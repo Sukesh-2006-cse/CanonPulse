@@ -1,4 +1,4 @@
-"""Local and Databricks Vector Search retrieval providers."""
+"""Local retrieval providers."""
 
 from __future__ import annotations
 
@@ -30,30 +30,3 @@ class LocalRetriever:
                 continue
             results.append(hit.model_copy(update={"score": max(hit.score, overlap / len(query_terms))}))
         return sorted(results, key=lambda hit: (-hit.score, hit.source_id))[: query.limit]
-
-
-class VectorSearchClient(Protocol):
-    def search(self, *, index_name: str, query: str, filters: dict[str, object], limit: int) -> list[dict]: ...
-
-
-class DatabricksVectorSearchRetriever:
-    def __init__(self, client: VectorSearchClient, index_name: str) -> None:
-        self._client = client
-        self._index_name = index_name
-
-    def search(self, query: RetrievalQuery) -> list[RetrievalHit]:
-        rows = self._client.search(
-            index_name=self._index_name,
-            query=query.text,
-            filters={"series_id": query.series_id, "version_id": query.version_id, "language": query.language, "allowed_source_ids": query.allowed_source_ids},
-            limit=query.limit,
-        )
-        return [
-            RetrievalHit.model_validate({**row, "permitted": row.get("permitted", True)})
-            for row in rows
-            if row.get("series_id") == query.series_id
-            and row.get("version_id") == query.version_id
-            and row.get("language") == query.language
-            and row.get("permitted", True)
-            and (not query.allowed_source_ids or row.get("source_id") in query.allowed_source_ids)
-        ][: query.limit]

@@ -1,26 +1,8 @@
 """Episode text -> dual-layer graph, via a real model call instead of rules.
 
-`HeuristicExtractor` is a deliberate floor: it has never seen a language
-model. `LLMExtractor` is the extractor the product actually claims to
-use -- Databricks Foundation Model APIs and OpenAI both speak
-OpenAI-compatible chat completions, so one client, differing only by base
-URL / token / model name, serves both:
-
-* Databricks Foundation Model API endpoint -> the governed, on-platform path.
-* OpenAI's own endpoint -> exists only so the number can be measured before a
-  Databricks workspace is authenticated. It must never be presented as the
-  governed path, so every result and every printed line carries a
-  ``backend`` label ("databricks" or "openai") derived from the endpoint URL,
-  never asserted by the caller.
-
-The prompt below requests exactly the JSON shape `sql/extract_graph.sql`
-asks the Databricks path for (same keys, same field lists), so the two paths
-stay one schema instead of drifting apart. It is written against the episode
-text and that schema only -- it has never seen, and must never be tuned
-against, `data/manifest/last_monsoon.yaml`. A prompt iterated until it
-recovers known defects would reproduce the exact circularity this evaluation
-plan exists to remove; if the model does poorly, that is the finding, not a
-bug to prompt-engineer away.
+`HeuristicExtractor` is a deterministic floor: it runs offline with no external
+dependencies. `LLMExtractor` connects to OpenAI-compatible chat completions
+endpoints (local models like Ollama / LM Studio / vLLM, or OpenAI API).
 
 Cost discipline: responses are cached to disk keyed by a hash of
 (model, prompt), so re-running against a warm cache is free and makes no
@@ -44,9 +26,7 @@ from app.extraction import ExtractionResult, attach_provenance, parse_extraction
 from app.extraction_models import ExtractionContext
 from app.narrative_models import Excerpt, LedgerEntry, NarrativeNode, PayoffLink
 
-# Same keys and field lists as sql/extract_graph.sql's ai_query prompt, so the
-# local (OpenAI/Databricks-direct) and on-platform (batched ai_query) paths
-# request one schema rather than two that can silently drift apart.
+# Prompt template for local/remote LLM narrative structure extraction.
 _PROMPT_TEMPLATE = (
     "Extract narrative structure as JSON. Return keys: nodes, entries, payoffs, excerpts. "
     "A node has id, episode, perceived_index, true_time (0-1 chronological position or null), "
@@ -79,11 +59,9 @@ def message_text(content: object) -> str:
     """Unwrap a chat-completion message's content into a plain string.
 
     Most OpenAI-compatible endpoints return a plain string. Reasoning-style
-    models (e.g. Databricks' gpt-oss serving endpoints) instead return a list
-    of typed blocks -- a "reasoning" block plus a "text" block -- and the
-    reasoning block is not the answer. Extracts and joins every "text" block,
-    ignoring anything else, so the caller gets the same plain-string shape
-    regardless of which kind of endpoint answered.
+    models instead return a list of typed blocks -- a "reasoning" block plus a
+    "text" block -- and the reasoning block is not the answer. Extracts and
+    joins every "text" block, ignoring anything else.
     """
     if isinstance(content, str):
         return content
@@ -146,21 +124,18 @@ def cache_key(model: str, prompt: str) -> str:
 
 
 def backend_for(endpoint: str) -> str:
-    """Which backend an endpoint URL names. A Databricks Foundation Model API
-    URL is the governed, on-platform path; anything else (principally
-    OpenAI's own endpoint) is the off-platform measurement path. This is a
-    property of the URL, never a caller-supplied label, so a result cannot
-    claim to be the governed path just because the caller says so."""
-    return "databricks" if "databricks" in endpoint.lower() else "openai"
+    """Which backend an endpoint URL names."""
+    ep = endpoint.lower()
+    if "openai" in ep:
+        return "openai"
+    return "local"
 
 
 class LLMExtractor:
     """Extractor backed by one OpenAI-compatible chat-completions endpoint.
 
     Conforms to `app.extraction.Extractor`. ``backend`` (derived from
-    ``endpoint``) is set on every returned `ExtractionResult` and is the
-    single source of truth for whether a number came from the governed
-    Databricks path or the off-platform OpenAI path.
+    ``endpoint``) is set on every returned `ExtractionResult`.
     """
 
     def __init__(
@@ -208,9 +183,9 @@ class LLMExtractor:
                 result.rejected += 1
                 continue
 
-            # As with DatabricksExtractor: one malformed item makes the whole
-            # row's contribution suspect, so it is rejected wholesale rather
-            # than item-by-item. The batch itself continues.
+            # One malformed item makes the whole row's contribution suspect,
+            # so it is rejected wholesale rather than item-by-item.
+            # The batch itself continues.
             try:
                 nodes = [NarrativeNode.model_validate(item) for item in parsed.get("nodes", [])]
                 entries = [LedgerEntry.model_validate(item) for item in parsed.get("entries", [])]

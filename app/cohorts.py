@@ -96,9 +96,7 @@ class CohortReaction(BaseModel):
 def structural_reaction(cohort: Cohort, episode: int, features: dict[str, float]) -> CohortReaction:
     """Score a boundary from structural signals only.
 
-    This is the deterministic local counterpart of the governed Databricks
-    cohort query. It intentionally does not inspect episode prose. The five
-    weight vectors therefore produce different reactions for reasons a writer
+    The five weight vectors produce different reactions for reasons a writer
     can inspect rather than because five prompts used different adjectives.
     """
     signals = {
@@ -128,38 +126,7 @@ def structural_reaction(cohort: Cohort, episode: int, features: dict[str, float]
     )
 
 
-from typing import Protocol
 
-
-class _CohortQuery(Protocol):
-    def __call__(self, sql: str, params: dict) -> list[tuple]: ...
-
-
-def databricks_cohort_reaction(cohort: Cohort, episode: int, series_id: str, query: _CohortQuery) -> CohortReaction:
-    """Governed on-platform cohort scoring, shaped like DatabricksExtractor's ai_query call.
-
-    Not wired to any API route: this environment has no Databricks workspace
-    to run it against. It exists so "real path for the 5-cohort simulator"
-    is not just an unfulfilled spec line -- the deterministic
-    `structural_reaction` above is the only path actually served by
-    /api/cohorts today, and stays so until this is configured and wired the
-    same opt-in way the deep-ingest and Writers Room LLM paths were wired.
-    """
-    sql = (
-        "SELECT ai_query('cohort-reaction-model', named_struct("
-        "'cohort_id', :cohort_id, 'episode', :episode, 'series_id', :series_id))"
-    )
-    rows = query(sql, {"cohort_id": cohort.id, "episode": episode, "series_id": series_id})
-    engagement = float(rows[0][0]) if rows else 0.0
-    vote = "continue" if engagement >= 0.67 else "hesitate" if engagement >= 0.42 else "stop"
-    return CohortReaction(
-        cohort_id=cohort.id,
-        episode=episode,
-        engagement=round(engagement, 6),
-        vote=vote,
-        reaction=f"{cohort.name} responds via the governed Databricks cohort query with {vote}.",
-        backend="databricks-ai_query",
-    )
 
 
 def blind_variants(rows: list[dict], seed: int = 42) -> tuple[list[dict], dict[int, int]]:
