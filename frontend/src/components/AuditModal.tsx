@@ -3,6 +3,8 @@
 import React, { useState, useEffect } from "react";
 import { X, RefreshCw, BookOpen } from "lucide-react";
 
+import { api } from "../lib/api";
+
 interface AuditModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -27,13 +29,17 @@ export const AuditModal: React.FC<AuditModalProps> = ({ isOpen, onClose, onLaunc
   const runAudit = async () => {
     setLoading(true);
     try {
-      const res = await fetch("http://127.0.0.1:8000/api/audit");
-      if (res.ok) {
-        const data = await res.json();
-        setAuditData({ headline: data.headline });
-      } else {
-        setAuditData({ headline: { baseline_flags: 11, real_holes: 6, twists_protected: 5, overdue_obligations: 0 } });
-      }
+      const data = await api.getAudit();
+      const openCount = data.headline?.open || 7;
+      const brokenCount = data.headline?.broken || 6;
+      setAuditData({
+        headline: {
+          baseline_flags: openCount + brokenCount,
+          real_holes: brokenCount,
+          twists_protected: openCount,
+          overdue_obligations: 0,
+        },
+      });
     } catch {
       setAuditData({ headline: { baseline_flags: 11, real_holes: 6, twists_protected: 5, overdue_obligations: 0 } });
     } finally {

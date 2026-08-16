@@ -18,7 +18,9 @@ import {
   Sparkles,
   Cpu,
   Upload,
+  RefreshCw,
 } from "lucide-react";
+import { api } from "../../lib/api";
 
 interface ProjectItem {
   id: string;
@@ -108,7 +110,10 @@ export const SeriesIngestionView: React.FC = () => {
   // Individual Episode Upload Form State
   const [newEpisodeNumber, setNewEpisodeNumber] = useState<number>(1);
   const [newEpisodeTitle, setNewEpisodeTitle] = useState("");
+  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [uploadedFileName, setUploadedFileName] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
   const [dragActive, setDragActive] = useState(false);
 
   // Active Project & Episodes lookup
@@ -139,38 +144,67 @@ export const SeriesIngestionView: React.FC = () => {
   };
 
   // Upload Individual Episode Handler
-  const handleUploadEpisode = () => {
+  const handleUploadEpisode = async () => {
     if (!newEpisodeTitle.trim()) return;
-    const newEp: EpisodeRecord = {
-      id: `ep-${Date.now()}`,
-      number: newEpisodeNumber || activeEpisodes.length + 1,
-      title: newEpisodeTitle,
-      wordCount: 1500 + Math.floor(Math.random() * 600),
-      status: "Complete",
-      graphStatus: 100,
-      lastUpdated: "Just now",
-    };
+    setUploading(true);
+    setUploadError(null);
 
-    const updatedEps = [newEp, ...activeEpisodes];
-    setEpisodesMap((prev) => ({ ...prev, [activeProjectId]: updatedEps }));
+    try {
+      let wordCount = 1500;
+      let status: "Complete" | "Processing" = "Complete";
 
-    // Update project episode count & word count
-    setProjects((prev) =>
-      prev.map((p) =>
-        p.id === activeProjectId
-          ? {
-              ...p,
-              episodesCount: updatedEps.length,
-              wordCount: `~${(updatedEps.length * 1600).toLocaleString()}`,
-              lastIngested: "Just now",
-            }
-          : p
-      )
-    );
+      if (uploadedFile) {
+        const formData = new FormData();
+        formData.append("file", uploadedFile);
+        formData.append("series_id", activeProjectId.toLowerCase().replace(/[^a-z0-9_]/g, "_"));
+        formData.append("title", newEpisodeTitle);
+        formData.append("genre", activeProject.genre);
+        formData.append("ongoing", "true");
+        formData.append("language", "en");
 
-    setNewEpisodeTitle("");
-    setUploadedFileName(null);
-    setIsUploadEpisodeModalOpen(false);
+        const res = await api.uploadDocumentFile(formData);
+        if (res.episodes && res.episodes.length > 0) {
+          wordCount = res.episodes[0].text ? res.episodes[0].text.split(/\s+/).length : 1800;
+        }
+      }
+
+      const newEp: EpisodeRecord = {
+        id: `ep-${Date.now()}`,
+        number: newEpisodeNumber || activeEpisodes.length + 1,
+        title: newEpisodeTitle,
+        wordCount,
+        status,
+        graphStatus: 100,
+        lastUpdated: "Just now",
+      };
+
+      const updatedEps = [newEp, ...activeEpisodes];
+      setEpisodesMap((prev) => ({ ...prev, [activeProjectId]: updatedEps }));
+
+      // Update project episode count & word count
+      setProjects((prev) =>
+        prev.map((p) =>
+          p.id === activeProjectId
+            ? {
+                ...p,
+                episodesCount: updatedEps.length,
+                wordCount: `~${updatedEps.reduce((acc, ep) => acc + ep.wordCount, 0).toLocaleString()} words`,
+                lastIngested: "Just now",
+              }
+            : p
+        )
+      );
+
+      setNewEpisodeTitle("");
+      setUploadedFile(null);
+      setUploadedFileName(null);
+      setIsUploadEpisodeModalOpen(false);
+    } catch (err: any) {
+      console.error("Episode ingestion failed", err);
+      setUploadError(err?.message || "Upload failed. Please check file format.");
+    } finally {
+      setUploading(false);
+    }
   };
 
   const filteredEpisodes = activeEpisodes.filter(
@@ -522,9 +556,11 @@ export const SeriesIngestionView: React.FC = () => {
                   e.preventDefault();
                   setDragActive(false);
                   if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-                    setUploadedFileName(e.dataTransfer.files[0].name);
+                    const f = e.dataTransfer.files[0];
+                    setUploadedFile(f);
+                    setUploadedFileName(f.name);
                     if (!newEpisodeTitle) {
-                      setNewEpisodeTitle(e.dataTransfer.files[0].name.replace(/\.[^/.]+$/, ""));
+                      setNewEpisodeTitle(f.name.replace(/\.[^/.]+$/, ""));
                     }
                   }
                 }}
@@ -534,36 +570,56 @@ export const SeriesIngestionView: React.FC = () => {
               >
                 <UploadCloud className="h-7 w-7 text-[#f2ca50]" />
                 <p className="text-xs font-bold text-[#f5f0e8]">
-                  {uploadedFileName ? `File Attached: ${uploadedFileName}` : "Drag & drop script file (.txt, .pdf, .md)"}
+                  {uploadedFileName ? `File Attached: ${uploadedFileName}` : "Drag & drop script file (.txt, .pdf, .docx, .fountain)"}
                 </p>
                 <label className="gold-button inline-block px-3.5 py-1.5 rounded-lg cursor-pointer text-xs font-bold">
                   Browse File
                   <input
                     type="file"
+                    accept=".txt,.pdf,.docx,.fountain,.fdx,.md"
                     className="hidden"
                     onChange={(e) => {
                       if (e.target.files && e.target.files[0]) {
-                        setUploadedFileName(e.target.files[0].name);
+                        const f = e.target.files[0];
+                        setUploadedFile(f);
+                        setUploadedFileName(f.name);
                         if (!newEpisodeTitle) {
-                          setNewEpisodeTitle(e.target.files[0].name.replace(/\.[^/.]+$/, ""));
+                          setNewEpisodeTitle(f.name.replace(/\.[^/.]+$/, ""));
                         }
                       }
                     }}
                   />
                 </label>
               </div>
+
+              {uploadError && (
+                <div className="bg-[rgba(255,92,77,0.1)] border border-[rgba(255,92,77,0.3)] rounded-lg p-2.5 text-xs text-[#ff5c4d]">
+                  {uploadError}
+                </div>
+              )}
             </div>
 
             <div className="pt-2 border-t border-[rgba(242,202,80,0.15)] flex justify-end gap-3 font-mono text-xs">
-              <button onClick={() => setIsUploadEpisodeModalOpen(false)} className="ghost-button px-4 py-2 rounded-lg text-[#9a9280]">
+              <button
+                disabled={uploading}
+                onClick={() => setIsUploadEpisodeModalOpen(false)}
+                className="ghost-button px-4 py-2 rounded-lg text-[#9a9280]"
+              >
                 Cancel
               </button>
               <button
                 onClick={handleUploadEpisode}
-                disabled={!newEpisodeTitle.trim()}
-                className="gold-button px-5 py-2 rounded-lg font-bold shadow-[0_0_15px_rgba(242,202,80,0.3)] disabled:opacity-50"
+                disabled={!newEpisodeTitle.trim() || uploading}
+                className="gold-button px-5 py-2 rounded-lg font-bold shadow-[0_0_15px_rgba(242,202,80,0.3)] disabled:opacity-50 flex items-center gap-2"
               >
-                Upload & Ingest Episode
+                {uploading ? (
+                  <>
+                    <RefreshCw className="h-3.5 w-3.5 animate-spin" />
+                    <span>Parsing & Ingesting...</span>
+                  </>
+                ) : (
+                  <span>Upload & Ingest Episode</span>
+                )}
               </button>
             </div>
           </div>

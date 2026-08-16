@@ -262,11 +262,10 @@ export const OverviewView: React.FC<OverviewViewProps> = ({
                 <div
                   key={proj.id}
                   onClick={() => handleProjectClick(proj)}
-                  className={`glass-panel p-5 rounded-2xl border transition-all cursor-pointer hover:scale-[1.02] flex flex-col justify-between space-y-4 shadow-lg group relative overflow-hidden ${
-                    isActive
-                      ? "border-[#f2ca50] bg-[#141408] ring-1 ring-[#f2ca50]/50"
-                      : "border-[rgba(242,202,80,0.2)] hover:border-[#f2ca50] bg-[#0d0d08] hover:bg-[#141408]"
-                  }`}
+                  className={`glass-panel p-5 rounded-2xl border transition-all cursor-pointer hover:scale-[1.02] flex flex-col justify-between space-y-4 shadow-lg group relative overflow-hidden ${isActive
+                    ? "border-[#f2ca50] bg-[#141408] ring-1 ring-[#f2ca50]/50"
+                    : "border-[rgba(242,202,80,0.2)] hover:border-[#f2ca50] bg-[#0d0d08] hover:bg-[#141408]"
+                    }`}
                 >
                   {/* Folder Header */}
                   <div className="flex items-start justify-between border-b border-[rgba(242,202,80,0.1)] pb-3">

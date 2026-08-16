@@ -37,6 +37,7 @@ import {
   ChevronDown,
   Copy,
 } from "lucide-react";
+import { api } from "../../lib/api";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // TYPES & DATA STRUCTURES
@@ -565,6 +566,17 @@ export const PersonaCollaborationView: React.FC = () => {
   const handleRunOrchestration = () => {
     handleReset();
     setAnalysisStatus("running");
+
+    // Fetch live annotations from backend in parallel
+    api.getWritersRoom(218, false)
+      .then((roomData) => {
+        if (roomData?.annotations) {
+          addLog(`Backend Engine: Scored ${roomData.annotations.length} live persona annotations via ${roomData.backend}`, "BACKEND", "accent");
+        }
+      })
+      .catch((err) => {
+        console.warn("Writers room live fetch fallback", err);
+      });
 
     addLog("System: Initializing Episode 218 Scene 4 context package...", "SYSTEM", "info");
     setTimeout(() => {
