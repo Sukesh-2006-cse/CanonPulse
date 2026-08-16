@@ -21,7 +21,7 @@ import { ExecutiveSuiteDashboard } from "@/components/ExecutiveSuite/ExecutiveSu
 export default function Home() {
   const [isAuditModalOpen, setIsAuditModalOpen] = useState(false);
   const [showSuite, setShowSuite] = useState(false);
-  const [suiteTab, setSuiteTab] = useState<"overview" | "graphengine" | "ingestion" | "findings" | "surfaces">("overview");
+  const [suiteTab, setSuiteTab] = useState<"overview" | "graphengine" | "ingestion" | "findings" | "surfaces" | "personacollab">("overview");
 
   // Sync hash routing on mount and hashchange
   React.useEffect(() => {
@@ -37,7 +37,7 @@ export default function Home() {
     return () => window.removeEventListener("hashchange", handleHashChange);
   }, []);
 
-  const handleOpenSuite = (tab: "overview" | "graphengine" | "ingestion" | "findings" | "surfaces" = "overview") => {
+  const handleOpenSuite = (tab: "overview" | "graphengine" | "ingestion" | "findings" | "surfaces" | "personacollab" = "overview") => {
     setSuiteTab(tab);
     setShowSuite(true);
     if (typeof window !== "undefined") {

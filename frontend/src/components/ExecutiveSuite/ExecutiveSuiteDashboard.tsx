@@ -1,29 +1,31 @@
 "use client";
 
 import React, { useState } from "react";
-import { LayoutGrid, Network, ShieldCheck, FileEdit, Plus, Settings, HelpCircle, Bell, History, Search, BookOpen, ArrowLeft, X, Menu } from "lucide-react";
+import { LayoutGrid, Network, ShieldCheck, FileEdit, Users, Plus, Settings, HelpCircle, Bell, History, Search, BookOpen, ArrowLeft, X, Menu } from "lucide-react";
 import { OverviewView } from "./OverviewView";
 import { GraphEngineView } from "./GraphEngineView";
 import { SeriesIngestionView } from "./SeriesIngestionView";
 import { FindingsEvidenceView } from "./FindingsEvidenceView";
 import { WriterSurfacesView } from "./WriterSurfacesView";
+import { PersonaCollaborationView } from "./PersonaCollaborationView";
 
 interface ExecutiveSuiteDashboardProps {
   onBackToLanding: () => void;
-  initialTab?: "overview" | "graphengine" | "ingestion" | "findings" | "surfaces";
+  initialTab?: "overview" | "graphengine" | "ingestion" | "findings" | "surfaces" | "personacollab";
 }
 
 export const ExecutiveSuiteDashboard: React.FC<ExecutiveSuiteDashboardProps> = ({
   onBackToLanding,
   initialTab = "overview",
 }) => {
-  const [activeTab, setActiveTab] = useState<"overview" | "graphengine" | "ingestion" | "findings" | "surfaces">(initialTab);
+  const [activeTab, setActiveTab] = useState<"overview" | "graphengine" | "ingestion" | "findings" | "surfaces" | "personacollab">(initialTab);
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const navItems = [
     { id: "overview", label: "Overview", icon: LayoutGrid },
     { id: "graphengine", label: "Graph Engine", icon: Network },
     { id: "findings", label: "Findings & Evidence", icon: ShieldCheck },
+    { id: "personacollab", label: "Persona Collaboration", icon: Users },
     { id: "surfaces", label: "Writer Surfaces", icon: FileEdit },
   ];
 
@@ -157,6 +159,8 @@ export const ExecutiveSuiteDashboard: React.FC<ExecutiveSuiteDashboardProps> = (
                   ? "Series Ingestion"
                   : activeTab === "findings"
                   ? "Findings & Evidence"
+                  : activeTab === "personacollab"
+                  ? "Persona Collaboration"
                   : "Writer Surfaces"}
               </span>
             </div>
@@ -194,6 +198,7 @@ export const ExecutiveSuiteDashboard: React.FC<ExecutiveSuiteDashboardProps> = (
           {activeTab === "graphengine" && <GraphEngineView />}
           {activeTab === "ingestion" && <SeriesIngestionView />}
           {activeTab === "findings" && <FindingsEvidenceView />}
+          {activeTab === "personacollab" && <PersonaCollaborationView />}
           {activeTab === "surfaces" && <WriterSurfacesView />}
         </main>
       </div>
