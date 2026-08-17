@@ -1,0 +1,170 @@
+{
+  "timestamp": "2026-08-16T17:05:05.226928+00:00",
+  "predictor": {
+    "model_version": "continuation-gbr-v1",
+    "feature_schema_version": "structural-v2",
+    "ci_method": "p90_held_out_residual",
+    "train_rows": 4733,
+    "test_rows": 1200,
+    "train_books": [
+      "gutenberg-11",
+      "gutenberg-120",
+      "gutenberg-1260",
+      "gutenberg-1661",
+      "gutenberg-174",
+      "gutenberg-219",
+      "gutenberg-2554",
+      "gutenberg-36",
+      "gutenberg-43",
+      "gutenberg-514",
+      "gutenberg-5200",
+      "gutenberg-55",
+      "gutenberg-76",
+      "gutenberg-768",
+      "gutenberg-98",
+      "synthetic-000",
+      "synthetic-001",
+      "synthetic-002",
+      "synthetic-003",
+      "synthetic-004",
+      "synthetic-005",
+      "synthetic-007",
+      "synthetic-008",
+      "synthetic-009",
+      "synthetic-010",
+      "synthetic-012",
+      "synthetic-014",
+      "synthetic-015",
+      "synthetic-016",
+      "synthetic-017",
+      "synthetic-018",
+      "synthetic-020",
+      "synthetic-021",
+      "synthetic-022",
+      "synthetic-023"
+    ],
+    "test_books": [
+      "gutenberg-1342",
+      "gutenberg-1400",
+      "gutenberg-2701",
+      "gutenberg-345",
+      "gutenberg-84",
+      "synthetic-006",
+      "synthetic-011",
+      "synthetic-013",
+      "synthetic-019"
+    ],
+    "train_mae": 0.2858292427806383,
+    "test_mae": 0.4093438119673205,
+    "test_rmse": 0.5868022560876641,
+    "test_r2": 0.6556631122504275,
+    "pearson_r": 0.8422482492548092,
+    "residual_p90_z": 1.0973526387288286,
+    "ci_coverage_percentage": 90.0,
+    "feature_importances": [
+      {
+        "feature_name": "broken_edge_count",
+        "importance_weight": 0.6671114963394318,
+        "rank": 1
+      },
+      {
+        "feature_name": "open_obligation_count",
+        "importance_weight": 0.20425596186071665,
+        "rank": 2
+      },
+      {
+        "feature_name": "fair_clue_density",
+        "importance_weight": 0.037710092112596676,
+        "rank": 3
+      },
+      {
+        "feature_name": "mean_urgency",
+        "importance_weight": 0.02636785791538591,
+        "rank": 4
+      },
+      {
+        "feature_name": "mean_payoff_distance",
+        "importance_weight": 0.014314390228323213,
+        "rank": 5
+      },
+      {
+        "feature_name": "min_payoff_distance",
+        "importance_weight": 0.013957532557385667,
+        "rank": 6
+      },
+      {
+        "feature_name": "perceived_time_jump",
+        "importance_weight": 0.013602777694039033,
+        "rank": 7
+      },
+      {
+        "feature_name": "suspended_edge_density",
+        "importance_weight": 0.011840716603955517,
+        "rank": 8
+      },
+      {
+        "feature_name": "character_thread_count",
+        "importance_weight": 0.009185274923038875,
+        "rank": 9
+      },
+      {
+        "feature_name": "sentiment_velocity",
+        "importance_weight": 0.0013311067424779507,
+        "rank": 10
+      },
+      {
+        "feature_name": "planting_recency",
+        "importance_weight": 0.0003227930226486929,
+        "rank": 11
+      }
+    ]
+  },
+  "extraction": {
+    "series_id": "alice_in_wonderland",
+    "manifest_source": "data/manifest/alice_in_wonderland.yaml",
+    "ledger_traversal": {
+      "backend_name": "Hand-Authored Ledger (Graph Traversal Only)",
+      "is_live_model": false,
+      "holes_caught": 6,
+      "holes_total": 6,
+      "hole_recall": 1.0,
+      "twists_protected": 5,
+      "twists_total": 5,
+      "twist_protection_rate": 1.0,
+      "false_positives": 0,
+      "clean_total": 4,
+      "false_positive_rate": 0.0,
+      "precision": 1.0,
+      "precision_ceiling": 0.55,
+      "obligations_tracked": 6,
+      "obligations_total": 6,
+      "extraction_rejected": 0,
+      "schema_compliance_rate": 1.0
+    },
+    "heuristic_extractor": {
+      "backend_name": "HeuristicExtractor (Offline Regex/Word-List)",
+      "is_live_model": false,
+      "holes_caught": 0,
+      "holes_total": 6,
+      "hole_recall": 0.0,
+      "twists_protected": 0,
+      "twists_total": 5,
+      "twist_protection_rate": 0.0,
+      "false_positives": 1,
+      "clean_total": 4,
+      "false_positive_rate": 0.25,
+      "precision": 0.0,
+      "precision_ceiling": 0.55,
+      "obligations_tracked": 3,
+      "obligations_total": 6,
+      "extraction_rejected": 0,
+      "schema_compliance_rate": 1.0
+    },
+    "llm_extractor": null,
+    "summary_notes": [
+      "Ledger Traversal achieves 100% precision and recall on hand-authored graph structures.",
+      "Reachable precision ceiling for extracted graphs is 0.55 (not 1.0) because twist protection requires explicit verified payoff links.",
+      "HeuristicExtractor serves as the 100% offline floor without network or LLM tokens."
+    ]
+  }
+}

@@ -12,7 +12,7 @@ from app.store import (
     store_from_env,
 )
 
-SERIES_PATH = Path("data/series/last_monsoon.json")
+SERIES_PATH = Path("data/series/alice_in_wonderland.json")
 
 
 def test_file_store_matches_series_loader_directly():
@@ -38,7 +38,7 @@ def test_store_from_env_with_custom_series_path(tmp_path):
     fake_series.write_text(SERIES_PATH.read_text(encoding="utf-8"), encoding="utf-8")
     store = store_from_env({"SERIES_PATH": str(fake_series)})
     assert isinstance(store, FileSeriesStore)
-    assert store.load().id == "last-monsoon"
+    assert store.load().id == "alice_in_wonderland"
 
 
 def test_approval_audit_store_records_and_retrieves_events():

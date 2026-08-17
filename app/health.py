@@ -18,7 +18,7 @@ def check_liveness() -> HealthReport:
 
 def check_readiness() -> HealthReport:
     checks = {
-        "store": {"status": "ready" if Path("data/series/last_monsoon.json").exists() else "missing"},
+        "store": {"status": "ready" if Path("data/series/alice_in_wonderland.json").exists() else "missing"},
         "model": {"status": "ready" if Path("app/predictor.py").exists() else "missing"},
         "retrieval": {"status": "ready" if Path("app/retrieval.py").exists() else "missing"},
     }

@@ -35,8 +35,8 @@ from app.predictor import FEATURE_ORDER, ContinuationPredictor  # noqa: E402
 from app.series_loader import load_series  # noqa: E402
 from app.training_corpus import generate_synthetic_corpus  # noqa: E402
 
-SERIES_PATH = REPO_ROOT / "data" / "series" / "last_monsoon.json"
-MANIFEST_PATH = REPO_ROOT / "data" / "manifest" / "last_monsoon.yaml"
+SERIES_PATH = REPO_ROOT / "data" / "series" / "alice_in_wonderland.json"
+MANIFEST_PATH = REPO_ROOT / "data" / "manifest" / "alice_in_wonderland.yaml"
 
 SYNTHETIC_CORPUS_NOTE = (
     "Fit to a synthetic corpus with a documented generative process "

@@ -9,16 +9,16 @@ from app.manifest import Manifest, ManifestItem, load_manifest, score_discrimina
 from app.narrative_models import Excerpt, LedgerEntry, ResolvedEntry, Series
 from app.series_loader import load_series
 
-SERIES = Path("data/series/last_monsoon.json")
-MANIFEST = Path("data/manifest/last_monsoon.yaml")
+SERIES = Path("data/series/alice_in_wonderland.json")
+MANIFEST = Path("data/manifest/alice_in_wonderland.yaml")
 
 
 def _synthetic_id(entry: LedgerEntry) -> str:
     """What a real extractor's id for this entry would look like -- never the
     manifest defect_id it happens to be authored as."""
     if entry.kind == "contradiction":
-        return f"contradiction-{entry.origin_episode}-{entry.latest_episode}"
-    return f"promise-{entry.origin_episode}-x"
+        return f"contradiction-{entry.origin_episode}-{entry.latest_episode}-{entry.id}"
+    return f"promise-{entry.origin_episode}-{entry.id}"
 
 
 def test_reports_both_the_authored_and_extracted_scores():

@@ -77,7 +77,7 @@ class FileSeriesStore:
         return load_series(self._path)
 
 
-def store_from_env(env: dict | None = None, default_series_path: Path | str = "data/series/last_monsoon.json") -> SeriesStore:
+def store_from_env(env: dict | None = None, default_series_path: Path | str = "data/series/alice_in_wonderland.json") -> SeriesStore:
     """Select the series store (Relational/PostgreSQL/SQLite or File)."""
     if env and env.get("DATABASE_URL"):
         from app.relational_store import RelationalSeriesStore

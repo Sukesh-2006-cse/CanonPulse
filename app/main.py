@@ -50,8 +50,8 @@ from app.training_corpus import generate_synthetic_corpus
 from app.variants import RepairEngine
 from app.verifier import PayoffVerifier
 
-SERIES_PATH = Path("data/series/last_monsoon.json")
-MANIFEST_PATH = Path("data/manifest/last_monsoon.yaml")
+SERIES_PATH = Path("data/series/alice_in_wonderland.json")
+MANIFEST_PATH = Path("data/manifest/alice_in_wonderland.yaml")
 
 # Every prediction shown by this app is fit to a documented synthetic corpus
 # (app/training_corpus.py), not to observed reader behaviour. Repeated on
