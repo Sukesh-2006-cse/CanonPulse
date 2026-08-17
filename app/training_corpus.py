@@ -91,7 +91,7 @@ def generate_synthetic_corpus(
         pressure = rng.uniform(0.5, 1.5)
 
         for chapter in range(1, chapters_per_book + 1):
-            open_obligation_count = min(8, round(rng.uniform(0, 6) * pressure))
+            open_obligation_count = min(10, round(rng.uniform(0, 8) * pressure))
             # Urgency is a mean over *open* obligations, so with none open the
             # real extractor yields 0.0. Mirror that rather than floor at 1.0,
             # or early boundaries in a real series fall outside the corpus.
@@ -106,14 +106,14 @@ def generate_synthetic_corpus(
             # A long serial accumulates unresolved contradictions; capping this
             # at 1 leaves the model unable to distinguish a mildly inconsistent
             # story from a badly broken one.
-            broken_count = rng.randint(0, 10) if rng.random() < 0.35 else 0
+            broken_count = rng.randint(0, 15) if rng.random() < 0.35 else 0
             planting_recency = rng.randint(0, min(chapter, 60))
-            suspended_density = round(rng.uniform(0, 0.3), 3)
+            suspended_density = round(rng.uniform(0, 0.6), 3)
             sentiment_velocity = round(rng.uniform(-1.2, 1.2), 3)
             perceived_time_jump = round(rng.uniform(0, 0.4), 3)
-            active_thread_count = min(open_obligation_count, rng.randint(0, 5))
-            min_payoff_distance = 0 if chapter == 1 else chapter + 1
-            mean_payoff_distance = chapter + 1
+            active_thread_count = min(open_obligation_count, rng.randint(0, 10))
+            min_payoff_distance = 0 if chapter <= 2 else chapter + 1
+            mean_payoff_distance = 0 if chapter <= 2 else chapter + 1
             fair_clue_density = round(rng.uniform(0.0, 1.0), 3)
 
             noise = rng.uniform(-NOISE_SPREAD, NOISE_SPREAD)

@@ -14,7 +14,7 @@ from app.series_loader import load_series
 
 INFERENCE_TIMEOUT_SECONDS = 5
 
-SERIES_PATH = Path("data/series/last_monsoon.json")
+SERIES_PATH = Path("data/series/alice_in_wonderland.json")
 
 
 def golden_path() -> dict:

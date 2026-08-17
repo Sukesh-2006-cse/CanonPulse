@@ -40,9 +40,9 @@ from app.llm_extractor import LLMExtractor, cache_key, prompt_for  # noqa: E402
 from app.manifest import load_manifest  # noqa: E402
 from app.series_loader import load_series  # noqa: E402
 
-SERIES_PATH = REPO_ROOT / "data" / "series" / "last_monsoon.json"
-MANIFEST_PATH = REPO_ROOT / "data" / "manifest" / "last_monsoon.yaml"
-DEFAULT_CACHE_PATH = REPO_ROOT / "data" / "extraction_cache" / "last_monsoon_llm.json"
+SERIES_PATH = REPO_ROOT / "data" / "series" / "alice_in_wonderland.json"
+MANIFEST_PATH = REPO_ROOT / "data" / "manifest" / "alice_in_wonderland.yaml"
+DEFAULT_CACHE_PATH = REPO_ROOT / "data" / "extraction_cache" / "alice_in_wonderland_llm.json"
 
 class CredentialsError(RuntimeError):
     pass

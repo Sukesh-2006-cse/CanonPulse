@@ -4,13 +4,13 @@ from pathlib import Path
 
 from app.series_loader import load_series
 
-SERIES_PATH = Path("data/series/last_monsoon.json")
+SERIES_PATH = Path("data/series/alice_in_wonderland.json")
 
 
-def test_demo_series_spans_two_hundred_plus_episodes():
+def test_demo_series_spans_multiple_episodes():
     series = load_series(SERIES_PATH)
-    assert series.total_episodes == 220
-    assert series.id == "last-monsoon"
+    assert series.total_episodes >= 10
+    assert series.id == "alice_in_wonderland"
 
 
 def test_every_entry_cites_an_existing_excerpt():

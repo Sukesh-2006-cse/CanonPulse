@@ -39,16 +39,23 @@ from app.training_corpus import (
 
 PLATFORM = "gutenberg"
 
-_CHAPTER_HEADING = re.compile(r"^\s*(?:CHAPTER|Chapter)\s+[IVXLCDM\d]+\.?\s*$", re.MULTILINE)
+_CHAPTER_HEADING = re.compile(
+    r"^\s*(?:"
+    r"(?:CHAPTER|Chapter|PART|Part|ACT|Act|ADVENTURE|Adventure|STORY|Story)\s+[IVXLCDM\d]+[^\n]*|"
+    r"(?:I|II|III|IV|V|VI|VII|VIII|IX|X|XI|XII|XIII|XIV|XV|XVI|XVII|XVIII|XIX|XX|XXI|XXII|XXIII|XXIV|XXV|XXVI|XXVII|XXVIII|XXIX|XXX|XXXI|XXXII|XXXIII|XXXIV|XXXV)\.\s+[A-Z0-9\s,–—'\"]+"
+    r")\s*$",
+    re.MULTILINE,
+)
 
 
 def split_into_chapters(text: str) -> list[str]:
-    """Split on 'CHAPTER <roman-or-digit>' headings. Falls back to the whole
+    """Split on chapter headings. Falls back to the whole
     text as one chapter when no heading matches -- still real prose, just
     with one boundary instead of many."""
     pieces = _CHAPTER_HEADING.split(text)
     chapters = [piece.strip() for piece in pieces if piece.strip()]
-    return chapters if chapters else [text]
+    return chapters if chapters else [text.strip()]
+
 
 
 def load_real_corpus_rows(raw_dir: Path) -> list[dict]:

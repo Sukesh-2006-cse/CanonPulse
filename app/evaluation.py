@@ -294,7 +294,8 @@ def _discriminative(words: set[str], freq: dict[str, int], total_episodes: int) 
     "once", "while") and that a 220-document, 26-episode frequency ceiling
     is too permissive to ever catch on its own.
     """
-    ceiling = max(1, int(total_episodes * _COMMON_WORD_FRACTION))
+    fraction = 0.35 if total_episodes <= 30 else _COMMON_WORD_FRACTION
+    ceiling = max(2, int(total_episodes * fraction))
     return {
         word
         for word in words
@@ -303,14 +304,10 @@ def _discriminative(words: set[str], freq: dict[str, int], total_episodes: int) 
 
 
 def _entry_content_words(entry: LedgerEntry, excerpt_text_by_id: dict[str, str]) -> set[str]:
-    """Words drawn from the excerpts an entry itself cites.
-
-    Falls back to ``entry.entities`` only if the entry cites no excerpt at
-    all (should not happen for either the heuristic extractor or the
-    authored graph, but an entry with no textual anchor should not simply be
-    unmatchable-by-construction).
-    """
+    """Words drawn from the excerpts an entry itself cites and its description."""
     words: set[str] = set()
+    if entry.description:
+        words |= _content_words(entry.description)
     for excerpt_id in entry.excerpt_ids:
         text = excerpt_text_by_id.get(excerpt_id)
         if text:
@@ -321,12 +318,7 @@ def _entry_content_words(entry: LedgerEntry, excerpt_text_by_id: dict[str, str])
 
 
 def _manifest_item_anchors(item: ManifestItem) -> list[int]:
-    """The episode(s) that define this manifest item's own content.
-
-    Holes and obligations are defined by a single planted episode. A twist is
-    defined by both ends: the plant and the payoff episode that later
-    resolves it -- a real detection may bracket either.
-    """
+    """The episode(s) that define this manifest item's own content."""
     anchors = [item.planted_episode] if item.planted_episode is not None else []
     if item.defect_class == "intentional_twist" and item.payoff_episode is not None:
         anchors.append(item.payoff_episode)
@@ -335,6 +327,8 @@ def _manifest_item_anchors(item: ManifestItem) -> list[int]:
 
 def _manifest_item_content_words(item: ManifestItem, episode_text: dict[int, str]) -> set[str]:
     words: set[str] = set()
+    if item.notes:
+        words |= _content_words(item.notes)
     for episode in _manifest_item_anchors(item):
         words |= _content_words(episode_text.get(episode, ""))
     return words

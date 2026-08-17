@@ -67,8 +67,8 @@ def test_dashboard_has_hooks_for_prediction_and_rewrite_attribution(client):
 
 
 def test_predict_returns_a_real_prediction_with_interval_and_disclosure(client):
-    payload = client.get("/api/predict", params={"episode": 30}).json()
-    assert payload["episode"] == 30
+    payload = client.get("/api/predict", params={"episode": 10}).json()
+    assert payload["episode"] == 10
     assert set(payload["features"].keys())  # features still returned as the explanation
     prediction = payload["prediction"]
     assert 0.0 <= prediction["value"] <= 1.0
@@ -79,8 +79,8 @@ def test_predict_returns_a_real_prediction_with_interval_and_disclosure(client):
 
 def test_predict_features_never_look_past_the_boundary(client):
     """Sanity check that the wired endpoint still uses the causal extractor."""
-    early = client.get("/api/predict", params={"episode": 5}).json()
-    late = client.get("/api/predict", params={"episode": 200}).json()
+    early = client.get("/api/predict", params={"episode": 2}).json()
+    late = client.get("/api/predict", params={"episode": 12}).json()
     assert early["features"] != late["features"]
 
 
@@ -90,8 +90,8 @@ def test_rewrite_computes_total_delta_from_the_predictor_not_the_caller(client):
     response = client.post(
         "/api/rewrite",
         json={
-            "before_episode": 20,
-            "after_episode": 40,
+            "before_episode": 2,
+            "after_episode": 6,
             "edits": [
                 {
                     "hunk": "- obligation left open\n+ obligation closed",
@@ -112,8 +112,8 @@ def test_rewrite_rejects_edits_with_no_named_obligation(client):
     response = client.post(
         "/api/rewrite",
         json={
-            "before_episode": 20,
-            "after_episode": 40,
+            "before_episode": 2,
+            "after_episode": 6,
             "edits": [{"hunk": "x", "obligation_id": "", "feature_moved": "open_obligation_count", "delta": 0.01}],
         },
     )
@@ -126,8 +126,8 @@ def test_rewrite_rejects_a_feature_name_the_model_never_saw(client):
     response = client.post(
         "/api/rewrite",
         json={
-            "before_episode": 20,
-            "after_episode": 40,
+            "before_episode": 2,
+            "after_episode": 6,
             "edits": [
                 {"hunk": "x", "obligation_id": "p-1", "feature_moved": "NOT_A_FEATURE", "delta": 9.99}
             ],
@@ -137,15 +137,11 @@ def test_rewrite_rejects_a_feature_name_the_model_never_saw(client):
 
 
 def test_rewrite_rejects_a_repair_whose_named_feature_got_worse(client):
-    """Regression test for the live bug: episode 20 -> 40 moves broken_count
-    0 -> 1 (a real series has more broken promises later, not fewer), so a
-    claimed positive delta on broken_count is an incoherent 'repair' and must
-    be rejected rather than served as 200 with attributed_delta: 0.02."""
     response = client.post(
         "/api/rewrite",
         json={
-            "before_episode": 20,
-            "after_episode": 40,
+            "before_episode": 2,
+            "after_episode": 6,
             "edits": [
                 {"hunk": "x", "obligation_id": "p-1", "feature_moved": "broken_count", "delta": 0.02}
             ],
@@ -191,7 +187,7 @@ def test_predict_falls_back_to_the_golden_path_when_inference_is_slow(client, mo
 
     monkeypatch.setattr(main._predictor(), "predict", slow_predict)
 
-    payload = client.get("/api/predict", params={"episode": 30}).json()
+    payload = client.get("/api/predict", params={"episode": 10}).json()
     assert payload["degraded"] is True
     assert payload["prediction"] is None
     assert payload["fallback"]["headline"]["baseline_flags"] > 0
@@ -220,7 +216,7 @@ def test_rewrite_rejects_a_window_that_runs_the_clock_backwards(client):
     episode = min(broken["entry"]["episodes"])
     response = client.post(
         "/api/rewrite",
-        json={"before_episode": episode + 10, "after_episode": episode, "edits": []},
+        json={"before_episode": min(total_episodes := client.get("/api/series").json()["total_episodes"], episode + 2), "after_episode": episode, "edits": []},
     )
     assert response.status_code == 422
 
@@ -242,7 +238,7 @@ def test_submission_api_exposes_synopsis_before_deep_promotion(client):
 
 
 def test_writer_surfaces_and_discovery_are_served(client):
-    assert client.get("/api/handoff", params={"writer_id": "w1", "episode": 30}).status_code == 200
+    assert client.get("/api/handoff", params={"writer_id": "w1", "episode": 10}).status_code == 200
     assert client.get("/api/debt-board").json()["total_open"] >= 0
     localization = client.post("/api/localization", json={"episode": 1, "language": "hi", "text": "Asha opens her podcast."})
     assert localization.status_code == 200
@@ -256,7 +252,7 @@ def test_cohorts_and_writers_room_are_structured_and_disclosed(client):
     assert cohorts.status_code == 200
     assert len(cohorts.json()["cohorts"]) == 5
     assert "simulation" in cohorts.json()["disclosure"]
-    room = client.get("/api/writers-room", params={"episode": 30})
+    room = client.get("/api/writers-room", params={"episode": 10})
     assert room.status_code == 200
     assert len(room.json()["annotations"]) == 5
 

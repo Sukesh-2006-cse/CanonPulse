@@ -1,0 +1,136 @@
+series_id: alice_in_wonderland
+authored_by: lewis_carroll
+items:
+  # --- 6 accidental holes: contradiction, no payoff anywhere ---
+  - defect_id: hole-01
+    defect_class: accidental_hole
+    planted_episode: 2
+    payoff_episode: null
+    expected_state: broken
+    notes: "Pool of tears size contradiction without size potion in Chapter 2."
+  - defect_id: hole-02
+    defect_class: accidental_hole
+    planted_episode: 7
+    payoff_episode: null
+    expected_state: broken
+    notes: "Mad Tea-Party riddle 'Why is a raven like a writing-desk?' has no canonical answer."
+  - defect_id: hole-03
+    defect_class: accidental_hole
+    planted_episode: 4
+    payoff_episode: null
+    expected_state: broken
+    notes: "Alice's thimble prize disappears between Chapter 4 and Chapter 5."
+  - defect_id: hole-04
+    defect_class: accidental_hole
+    planted_episode: 6
+    payoff_episode: null
+    expected_state: broken
+    notes: "Cheshire Cat grin disappears left-to-right in Chapter 6, right-to-left in Chapter 8."
+  - defect_id: hole-05
+    defect_class: accidental_hole
+    planted_episode: 9
+    payoff_episode: null
+    expected_state: broken
+    notes: "Duchess moral rules contradict Gryphon school rules."
+  - defect_id: hole-06
+    defect_class: accidental_hole
+    planted_episode: 10
+    payoff_episode: null
+    expected_state: broken
+    notes: "Lobster Quadrille song lyrics change stanza order without explanation."
+
+  # --- 5 intentional twists: contradiction-shaped, payoff downstream ---
+  - defect_id: twist-01
+    defect_class: intentional_twist
+    planted_episode: 1
+    payoff_episode: 12
+    expected_state: suspended
+    notes: "Rabbit hole dream logic: the entire series of surreal events is revealed as a dream in Chapter 12."
+  - defect_id: twist-02
+    defect_class: intentional_twist
+    planted_episode: 5
+    payoff_episode: 11
+    expected_state: suspended
+    notes: "Caterpillar's mushroom edges advice pays off during courtroom testimony in Chapter 11."
+  - defect_id: twist-03
+    defect_class: intentional_twist
+    planted_episode: 3
+    payoff_episode: 8
+    expected_state: suspended
+    notes: "White Rabbit's dropped fan returns as Queen's croquet requirement in Chapter 8."
+  - defect_id: twist-04
+    defect_class: intentional_twist
+    planted_episode: 4
+    payoff_episode: 9
+    expected_state: suspended
+    notes: "Mouse's tail story poem pays off when meeting the Mock Turtle in Chapter 9."
+  - defect_id: twist-05
+    defect_class: intentional_twist
+    planted_episode: 8
+    payoff_episode: 10
+    expected_state: suspended
+    notes: "March Hare's watch butter repair pays off in Lobster Quadrille trial in Chapter 10."
+
+  # --- 6 outstanding obligations ---
+  - defect_id: obligation-01
+    defect_class: outstanding_obligation
+    planted_episode: 8
+    payoff_episode: null
+    expected_state: outstanding
+    notes: "Queen of Hearts croquet trial obligation left pending."
+  - defect_id: obligation-02
+    defect_class: outstanding_obligation
+    planted_episode: 6
+    payoff_episode: null
+    expected_state: outstanding
+    notes: "Promise to visit March Hare tea garden."
+  - defect_id: obligation-03
+    defect_class: outstanding_obligation
+    planted_episode: 9
+    payoff_episode: null
+    expected_state: outstanding
+    notes: "Mock Turtle promises to recite history of sea school."
+  - defect_id: obligation-04
+    defect_class: outstanding_obligation
+    planted_episode: 4
+    payoff_episode: null
+    expected_state: outstanding
+    notes: "Bill the lizard vow to fetch the garden ladder."
+  - defect_id: obligation-05
+    defect_class: outstanding_obligation
+    planted_episode: 11
+    payoff_episode: null
+    expected_state: outstanding
+    notes: "Knave of Hearts tarts stolen vow to discover the baker."
+  - defect_id: obligation-06
+    defect_class: outstanding_obligation
+    planted_episode: 5
+    payoff_episode: null
+    expected_state: outstanding
+    notes: "Pigeon's nest serpent investigation promise left open."
+
+  # --- 4 clean controls ---
+  - defect_id: clean-01
+    defect_class: clean_control
+    planted_episode: 3
+    payoff_episode: null
+    expected_state: paid
+    notes: "Caucus-race resolves immediately in Chapter 3."
+  - defect_id: clean-02
+    defect_class: clean_control
+    planted_episode: 6
+    payoff_episode: null
+    expected_state: paid
+    notes: "Cheshire Cat directions to March Hare in Chapter 6."
+  - defect_id: clean-03
+    defect_class: clean_control
+    planted_episode: 7
+    payoff_episode: null
+    expected_state: paid
+    notes: "Dormouse teapot tea-time bedtime story in Chapter 7."
+  - defect_id: clean-04
+    defect_class: clean_control
+    planted_episode: 10
+    payoff_episode: null
+    expected_state: paid
+    notes: "Gryphon lobster dance demonstration in Chapter 10."
