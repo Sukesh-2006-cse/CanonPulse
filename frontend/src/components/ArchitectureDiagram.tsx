@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { Clock, Eye, Cpu, CheckCircle2 } from "lucide-react";
 import { ScrollReveal } from "./ScrollReveal";
 import { MotionCard } from "./MotionCard";
+import { FoldText } from "./FoldText/FoldText";
 
 export const ArchitectureDiagram: React.FC = () => {
   const [activeLayer, setActiveLayer] = useState<"all" | "perceived" | "true">("all");
@@ -24,9 +25,11 @@ export const ArchitectureDiagram: React.FC = () => {
               style={{ fontFamily: "var(--font-display)" }}
               className="text-4xl sm:text-5xl lg:text-6xl font-semibold text-[#f5f0e8] leading-tight"
             >
-              Two Timelines.
+              <FoldText text="Two Timelines." splitBy="word" trigger="scroll" hinge="top" color="#f5f0e8" />
               <br />
-              <em className="italic text-[#d4c49a]">One Story.</em>
+              <em className="italic text-[#d4c49a]">
+                <FoldText text="One Story." splitBy="word" trigger="scroll" hinge="top" color="#d4c49a" />
+              </em>
             </h2>
             <p style={{ fontFamily: "var(--font-body)" }} className="text-base text-[#9a9280] italic">
               CanonPulse evaluates both audience presentation order and true story chronology simultaneously.

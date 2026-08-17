@@ -9,17 +9,21 @@ import {
   Languages,
   ArrowRight,
   Sparkles,
-  Search,
   CheckCircle2,
+  GitBranch,
+  ShieldCheck,
+  Zap,
+  Search,
   TrendingUp,
   ShieldAlert,
   Layers,
-  Zap,
   Bookmark,
   ChevronRight,
   Activity,
 } from "lucide-react";
 import { ScrollReveal } from "./ScrollReveal";
+import { MotionCard } from "./MotionCard";
+import { FoldText } from "./FoldText/FoldText";
 
 interface FeaturesGridProps {
   onOpenSurfaces?: () => void;
@@ -108,7 +112,7 @@ export const FeaturesGrid: React.FC<FeaturesGridProps> = ({ onOpenSurfaces }) =>
   return (
     <section
       id="features"
-      className="section-glow relative py-32 border-b border-[rgba(242,202,80,0.12)] bg-[#070703] overflow-hidden"
+      className="section-glow relative py-32 border-b border-[rgba(242,202,80,0.12)] bg-[#070703]/40 overflow-hidden"
     >
       {/* Background ambient lighting effects */}
       <div className="absolute top-1/4 left-10 w-[500px] h-[500px] bg-[radial-gradient(circle,rgba(242,202,80,0.06)_0%,transparent_65%)] pointer-events-none" />
@@ -132,9 +136,11 @@ export const FeaturesGrid: React.FC<FeaturesGridProps> = ({ onOpenSurfaces }) =>
               style={{ fontFamily: "var(--font-display)" }}
               className="text-4xl sm:text-5xl lg:text-6xl font-semibold text-[#f5f0e8] leading-tight"
             >
-              Five Essential Views.
+              <FoldText text="Five Essential Views." splitBy="word" trigger="scroll" hinge="top" color="#f5f0e8" />
               <br />
-              <span className="italic text-[#f2ca50]">One Dual-Layer Graph Ledger.</span>
+              <em className="italic text-[#f2ca50]">
+                <FoldText text="One Unified Ledger." splitBy="word" trigger="scroll" hinge="top" color="#f2ca50" />
+              </em>
             </h2>
 
             <p

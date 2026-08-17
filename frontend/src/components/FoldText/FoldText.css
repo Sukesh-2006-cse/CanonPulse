@@ -1,0 +1,50 @@
+.fold-text {
+  display: inline-block;
+  position: relative;
+  font-size: var(--fold-text-font-size, inherit);
+  font-weight: var(--fold-text-font-weight, inherit);
+  color: var(--fold-text-color, inherit);
+  line-height: inherit;
+}
+
+.fold-text-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.fold-text-visual {
+  display: inline;
+}
+
+.fold-text-segment {
+  display: inline-block;
+  perspective: var(--fold-perspective, 700px);
+  transform-style: preserve-3d;
+  vertical-align: top;
+  will-change: transform;
+}
+
+.fold-text-piece {
+  display: inline-block;
+  transform-style: preserve-3d;
+  filter: brightness(calc(1 - var(--fold-crease, 0)));
+  backface-visibility: hidden;
+  will-change: transform, opacity, filter;
+  color: var(--fold-text-color, inherit);
+}
+
+.fold-text-line {
+  display: block;
+}
+
+.fold-text-whitespace {
+  display: inline-block;
+  white-space: pre;
+}

@@ -44,28 +44,28 @@ export default function Home() {
   }, []);
 
   const handleOpenSuite = (tab: "overview" | "graphengine" | "ingestion" | "findings" | "surfaces" | "personacollab" | "continuitystudio" = "overview") => {
-    setSuiteTab(tab);
-    setShowSuite(true);
-    if (typeof window !== "undefined") {
-      window.location.hash = "suite";
-      window.scrollTo({ top: 0, behavior: "instant" });
-    }
+      setSuiteTab(tab);
+      setShowSuite(true);
+      if (typeof window !== "undefined") {
+        window.location.hash = "suite";
+        window.scrollTo({ top: 0, behavior: "instant" });
+      }
   };
 
   const handleBackToLanding = () => {
-    setShowSuite(false);
-    if (typeof window !== "undefined") {
-      window.location.hash = "";
-      window.scrollTo({ top: 0, behavior: "instant" });
-    }
+      setShowSuite(false);
+      if (typeof window !== "undefined") {
+        window.location.hash = "";
+        window.scrollTo({ top: 0, behavior: "instant" });
+      }
   };
 
   if (showSuite) {
     return (
-      <ExecutiveSuiteDashboard
-        initialTab={suiteTab}
-        onBackToLanding={handleBackToLanding}
-      />
+        <ExecutiveSuiteDashboard
+          initialTab={suiteTab}
+          onBackToLanding={handleBackToLanding}
+        />
     );
   }
 

@@ -27,3 +27,8 @@ testpaths = ["tests"]
 # The app is run in place, not installed, so pytest needs the repo root on
 # sys.path to import `app`. Without this, plain `pytest` cannot collect.
 pythonpath = ["."]
+filterwarnings = [
+  "ignore::starlette.exceptions.StarletteDeprecationWarning",
+]
+
+

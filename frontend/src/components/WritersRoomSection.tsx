@@ -15,6 +15,8 @@ import {
   Scale,
 } from "lucide-react";
 import { ScrollReveal } from "./ScrollReveal";
+import { MotionCard } from "./MotionCard";
+import { FoldText } from "./FoldText/FoldText";
 
 interface WritersRoomSectionProps {
   onOpenCollaboration?: () => void;
@@ -124,7 +126,7 @@ export const WritersRoomSection: React.FC<WritersRoomSectionProps> = ({ onOpenCo
   const current = personas[activePersona];
 
   return (
-    <section className="section-glow relative py-28 border-b border-[rgba(242,202,80,0.12)] bg-[#0a0a04] overflow-hidden">
+    <section className="section-glow relative py-28 border-b border-[rgba(242,202,80,0.12)] bg-[#0a0a04]/40 overflow-hidden">
       <div className="absolute top-1/3 right-10 w-[500px] h-[400px] bg-[radial-gradient(circle,rgba(242,202,80,0.06)_0%,transparent_65%)] pointer-events-none" />
 
       <div className="relative z-10 mx-auto max-w-7xl px-6 space-y-16">
@@ -145,9 +147,11 @@ export const WritersRoomSection: React.FC<WritersRoomSectionProps> = ({ onOpenCo
               style={{ fontFamily: "var(--font-display)" }}
               className="text-4xl sm:text-5xl lg:text-6xl font-semibold text-[#f5f0e8] leading-tight"
             >
-              Five Editorial Minds.
+              <FoldText text="Five Editorial Minds." splitBy="word" trigger="scroll" hinge="top" color="#f5f0e8" />
               <br />
-              <span className="italic text-[#f2ca50]">One Multi-Perspective Review.</span>
+              <em className="italic text-[#f2ca50]">
+                <FoldText text="One Multi-Perspective Review." splitBy="word" trigger="scroll" hinge="top" color="#f2ca50" />
+              </em>
             </h2>
 
             <p

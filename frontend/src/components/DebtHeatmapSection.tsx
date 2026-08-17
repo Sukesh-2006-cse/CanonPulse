@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { Play, Pause, RotateCcw, Sliders } from "lucide-react";
 import { ScrollReveal } from "./ScrollReveal";
 import { MotionCard } from "./MotionCard";
+import { FoldText } from "./FoldText/FoldText";
 
 interface ArcData {
   episode: number;
@@ -143,9 +144,11 @@ export const DebtHeatmapSection: React.FC = () => {
               style={{ fontFamily: "var(--font-display)" }}
               className="text-4xl sm:text-5xl lg:text-6xl font-semibold text-[#f5f0e8] leading-tight"
             >
-              Scrub the episode timeline.
+              <FoldText text="Scrub the episode timeline." splitBy="word" trigger="scroll" hinge="top" color="#f5f0e8" />
               <br />
-              <em className="italic text-[#d4c49a]">Track narrative debt live.</em>
+              <em className="italic text-[#d4c49a]">
+                <FoldText text="Track narrative debt live." splitBy="word" trigger="scroll" hinge="top" color="#d4c49a" />
+              </em>
             </h2>
             <p style={{ fontFamily: "var(--font-body)" }} className="text-base text-[#9a9280] italic">
               Drag the scrubber or click episode bars to inspect how promises accumulate and resolve live.

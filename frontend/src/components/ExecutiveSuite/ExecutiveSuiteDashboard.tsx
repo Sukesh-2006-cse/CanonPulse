@@ -36,6 +36,7 @@ import { FindingsEvidenceView } from "./FindingsEvidenceView";
 import { WriterSurfacesView } from "./WriterSurfacesView";
 import { PersonaCollaborationView } from "./PersonaCollaborationView";
 import { ContinuityStudioView } from "./ContinuityStudioView";
+import { InteractiveBackground } from "@/components/InteractiveBackground";
 
 interface ExecutiveSuiteDashboardProps {
   onBackToLanding: () => void;

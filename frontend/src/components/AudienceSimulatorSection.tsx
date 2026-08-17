@@ -14,6 +14,7 @@ import {
   Zap,
 } from "lucide-react";
 import { ScrollReveal } from "./ScrollReveal";
+import { FoldText } from "./FoldText/FoldText";
 
 interface AudienceSimulatorSectionProps {
   onOpenCohortView?: () => void;
@@ -76,7 +77,7 @@ export const AudienceSimulatorSection: React.FC<AudienceSimulatorSectionProps> =
   const currentCohort = cohorts.find((c) => c.id === activeCohort) || cohorts[0];
 
   return (
-    <section className="section-glow relative py-28 border-b border-[rgba(242,202,80,0.12)] bg-[#070703] overflow-hidden">
+    <section className="section-glow relative py-28 border-b border-[rgba(242,202,80,0.12)] bg-[#070703]/40 overflow-hidden">
       <div className="absolute bottom-10 left-1/4 w-[600px] h-[450px] bg-[radial-gradient(ellipse,rgba(126,224,138,0.06)_0%,transparent_65%)] pointer-events-none" />
 
       <div className="relative z-10 mx-auto max-w-7xl px-6 space-y-16">
@@ -97,9 +98,11 @@ export const AudienceSimulatorSection: React.FC<AudienceSimulatorSectionProps> =
               style={{ fontFamily: "var(--font-display)" }}
               className="text-4xl sm:text-5xl lg:text-6xl font-semibold text-[#f5f0e8] leading-tight"
             >
-              Five Reader Archetypes.
+              <FoldText text="Five Reader Archetypes." splitBy="word" trigger="scroll" hinge="top" color="#f5f0e8" />
               <br />
-              <span className="italic text-[#7ee08a]">Predictive Churn Modeling.</span>
+              <em className="italic text-[#7ee08a]">
+                <FoldText text="Predictive Churn Modeling." splitBy="word" trigger="scroll" hinge="top" color="#7ee08a" />
+              </em>
             </h2>
 
             <p

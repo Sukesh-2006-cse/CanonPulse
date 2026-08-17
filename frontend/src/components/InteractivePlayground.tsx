@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { FileSearch, Sparkles, ArrowRight } from "lucide-react";
 import { ScrollReveal } from "./ScrollReveal";
+import { FoldText } from "./FoldText/FoldText";
 
 export const InteractivePlayground: React.FC = () => {
   const [proposedText, setProposedText] = useState(
@@ -37,9 +38,11 @@ export const InteractivePlayground: React.FC = () => {
               style={{ fontFamily: "var(--font-display)" }}
               className="text-4xl sm:text-5xl lg:text-6xl font-semibold text-[#f5f0e8] leading-tight"
             >
-              Evidence &amp; Surgical
+              <FoldText text="Evidence & Surgical" splitBy="word" trigger="scroll" hinge="top" color="#f5f0e8" />
               <br />
-              <em className="italic text-[#d4c49a]">Repair.</em>
+              <em className="italic text-[#d4c49a]">
+                <FoldText text="Repair." splitBy="word" trigger="scroll" hinge="top" color="#d4c49a" />
+              </em>
             </h2>
           </div>
         </ScrollReveal>
